@@ -25,7 +25,7 @@ data class ApiMessage(
     @Optional var protocol: String = "",
     @Optional var event: String = "",
     @Optional var id: String = "",
-    @Optional var Extra: String? = ""
+    @Optional var Extra: Map<String, String>? = null
 ) {
 
     fun encode(): String {
@@ -71,9 +71,9 @@ data class ApiMessage(
             obj.id.takeIf { it.isNotEmpty() }?.let {
                 elemOutput.encodeStringElement(descriptor, 10, it)
             }
-            obj.Extra.takeIf { ! it.isNullOrEmpty() }?.let {
-                elemOutput.encodeStringElement(descriptor, 11, it)
-            }
+//            obj.Extra.takeIf { ! it.isNullOrEmpty() }?.let {
+//                elemOutput.encodeStringElement(descriptor, 11, it)
+//            }
             elemOutput.endStructure(descriptor)
         }
 

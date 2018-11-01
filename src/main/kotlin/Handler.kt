@@ -1,10 +1,13 @@
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.cancelChildren
@@ -16,6 +19,7 @@ import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import matterlink.api.ApiMessage
 import mu.KLogging
 import java.io.Reader
@@ -30,11 +34,11 @@ class Handler(
     var broadcast = messageBroadcast()
         private set
 
-    private var sendChannel: SendChannel<ApiMessage> = apiSender()
+    private var sendChannel: SendChannel<ApiMessage> = senderActor()
 
     val keepOpenManager = FuelManager().apply {
-        timeoutInMillisecond = 0 // 10_000
-        timeoutReadInMillisecond = 0 // 10_000
+        timeoutInMillisecond = 1000
+        timeoutReadInMillisecond = 0
     }
 
     var enabled = true
@@ -49,7 +53,7 @@ class Handler(
                     broadcast = messageBroadcast()
                 }
                 if (sendChannel.isClosedForSend && enabled) {
-                    sendChannel = apiSender()
+                    sendChannel = senderActor()
                 }
             }
         }
@@ -66,7 +70,7 @@ class Handler(
             broadcast = messageBroadcast()
         }
         if (sendChannel.isClosedForSend && enabled) {
-            sendChannel = apiSender()
+            sendChannel = senderActor()
         }
     }
 
@@ -80,7 +84,7 @@ class Handler(
 
     companion object : KLogging()
 
-    private fun CoroutineScope.apiSender() = actor<ApiMessage>(context = Dispatchers.IO) {
+    private fun CoroutineScope.senderActor() = actor<ApiMessage>(context = Dispatchers.IO) {
         val url = "$host/api/message"
 
         consumeEach {
@@ -107,26 +111,25 @@ class Handler(
                 }
             }
         }
-
-    }
-
-    private fun ProducerScope<ApiMessage>.deserializer() = object : ResponseDeserializable<Unit> {
-        override fun deserialize(reader: Reader) {
-            logger.info("connection open")
-            reader.forEachLine { line ->
-                val msg = ApiMessage.decode(line)
-                launch {
-                    send(msg)
-                }
-            }
-        }
     }
 
     private fun CoroutineScope.messageBroadcast() = broadcast<ApiMessage>(context = Dispatchers.IO) {
         while (isActive) {
             logger.info("opening connection")
             val (_, response, result) = keepOpenManager.request(Method.GET, "$host/api/stream")
-                .responseObject(deserializer())
+                .awaitObjectResponse(object : ResponseDeserializable<Unit> {
+                    override fun deserialize(reader: Reader) = runBlocking (Dispatchers.IO + CoroutineName("msgReceiver")) {
+                        logger.info("connection open")
+                        reader.useLines { lines ->
+                            lines.forEach { line ->
+                                val msg = ApiMessage.decode(line)
+                                if (msg.event != "api_connect") {
+                                    send(msg)
+                                }
+                            }
+                        }
+                    }
+                })
 
             when (result) {
                 is Result.Success -> {
@@ -135,13 +138,13 @@ class Handler(
                 is Result.Failure -> {
                     logger.error("connection error")
                     logger.error("response: $response")
-                    logger.error(result.error.exception) {
+                    logger.error/*(result.error.exception)*/ {
                         result.error.localizedMessage
                     }
 //                    throw result.error.exception
                 }
             }
-            delay(1000)
+            delay(1000) // reconnect delay
         }
     }
 }

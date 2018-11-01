@@ -1,25 +1,9 @@
-import com.github.kittinunf.fuel.httpPost
-import com.github.kittinunf.result.Result
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.actor
-import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.io.IOException
 import matterlink.api.ApiMessage
-import matterlink.api.StreamConnection
 import mu.KLogging
-import java.net.ConnectException
-import java.net.HttpURLConnection
-import java.net.MalformedURLException
-import java.net.URL
-import java.util.Arrays
-import kotlin.coroutines.CoroutineContext
 
 object Main : KLogging() {
     @ExperimentalCoroutinesApi
@@ -70,17 +54,17 @@ object Main : KLogging() {
             }
             logger.info("launched sender")
 
-            delay(2000)
-            incomingMessages.cancel()
-            logger.info("incoming: ${incomingMessages.isClosedForReceive}")
-
-            val incomingMessages2 = handler.broadcast.openSubscription()
-            launch {
-                for (msg in incomingMessages2) {
-//                    delay(100)
-                    logger.info("received_2 msg: $msg")
-                }
-            }
+//            delay(3000)
+//            incomingMessages.cancel()
+//            logger.info("incoming: ${incomingMessages.isClosedForReceive}")
+//
+//            val incomingMessages2 = handler.broadcast.openSubscription()
+//            launch {
+//                for (msg in incomingMessages2) {
+////                    delay(100)
+//                    logger.info("received_2 msg: $msg")
+//                }
+//            }
         }
         logger.info("closing")
     }
