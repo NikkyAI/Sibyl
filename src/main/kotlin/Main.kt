@@ -2,6 +2,7 @@ import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.produce
@@ -21,6 +22,7 @@ import java.util.Arrays
 import kotlin.coroutines.CoroutineContext
 
 object Main : KLogging() {
+    @ExperimentalCoroutinesApi
     @JvmStatic
     fun main(args: Array<String>) {
         runBlocking {
