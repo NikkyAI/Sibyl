@@ -1,15 +1,13 @@
-pluginManagement {
+import de.fayard.dependencies.bootstrapRefreshVersionsAndDependencies
+buildscript {
     repositories {
-//        maven("http://dl.bintray.com/kotlin/kotlin-eap")
-        mavenCentral()
         gradlePluginPortal()
     }
-    resolutionStrategy {
-        eachPlugin {
-            if (requested.id.id == "kotlinx-serialization") {
-                useModule("org.jetbrains.kotlin:kotlin-serialization:${requested.version}")
-            }
-        }
-    }
+    dependencies.classpath("de.fayard:dependencies:0.5.8")
 }
+
+bootstrapRefreshVersionsAndDependencies(
+    listOf(rootDir.resolve("dependencies-rules.txt").readText())
+)
+
 rootProject.name = "Sibyl"

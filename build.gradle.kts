@@ -1,38 +1,58 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    kotlin("jvm")
+    kotlin("plugin.serialization")
     application
     idea
-    kotlin("jvm") version Kotlin.version
-    id(Serialization.plugin) version Kotlin.version
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven(url = "https://jitpack.io")
+}
+
+dependencies {
+    implementation(kotlin("stdlib", "_"))
+
+    implementation(KotlinX.serialization.runtime)
+    implementation(KotlinX.coroutines.core)
+
+    implementation(Ktor.client.core)
+    implementation(Ktor.client.cio)
+    implementation(Ktor.client.okHttp)
+    implementation(Ktor.client.jetty)
+    implementation(Ktor.client.json)
+    implementation(Ktor.client.serialization)
+    implementation(Ktor.client.websockets)
+
+//    implementation("com.github.kittinunf.fuel:fuel:3.x-SNAPSHOT")
+
+    implementation("io.github.microutils:kotlin-logging:_")
+    implementation("ch.qos.logback:logback-classic:_")
+
+    implementation("com.github.ajalt:clikt:_")
 }
 
 application {
     mainClassName = "Main"
 }
 
-repositories {
-    mavenLocal()
-//    maven(url = "https://dl.bintray.com/kotlin/kotlin-eap")
-    maven(url = "https://kotlin.bintray.com/kotlinx")
-    jcenter()
-    mavenCentral()
+tasks {
+    withType(JavaExec::class) {
+        logger.lifecycle("configuring JavaExec task: $name")
+
+        standardInput = System.`in`
+
+        workingDir = rootDir.resolve("run")
+        workingDir.mkdirs()
+
+        systemProperty("kotlinx.coroutines.debug", "on")
+    }
+    withType<KotlinCompile> {
+        kotlinOptions.jvmTarget = "1.8"
+    }
 }
 
-dependencies {
-    implementation(kotlin("stdlib"))
-    implementation(Serialization.dependency)
-    implementation(Coroutines.dependency)
-
-    implementation(Fuel.dependency)
-    implementation(Fuel.dependencyCoroutines)
-    implementation(Fuel.dependencySerialization)
-
-    compile(Logging.dependency)
-    compile(Logging.dependencyLogbackClassic)
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
-}
 

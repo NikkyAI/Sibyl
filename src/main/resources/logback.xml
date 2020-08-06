@@ -1,0 +1,39 @@
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger .\(%file:%line\) - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file> logs/latest.log </file>
+        <append>false</append>
+        <encoder>
+            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger .\(%file:%line\) - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="ASYNC-FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="FILE" />
+    </appender>
+
+    <!-- additivity=false ensures log messages only goes to the log file -->
+<!--
+    <logger name="libomv" level="INFO" additivity="false">
+        <appender-ref ref="ASYNC-FILE"/>
+    </logger>
+    <logger name="libomv" level="ERROR" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+-->
+<!--
+    <logger name="libomv" level="ERROR">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+-->
+    <!-- custom logging levels -->
+    <logger name="myapp.package2" level="INFO" />
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ASYNC-FILE"/>
+    </root>
+</configuration>

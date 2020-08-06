@@ -1,0 +1,159 @@
+
+[irc]
+    [irc.esper]
+    Server="irc.esper.net:6697"
+    Nick="yuno"
+
+    #Enable SASL (PLAIN) authentication. (freenode requires this from eg AWS hosts)
+    #It uses NickServNick and NickServPassword as login and password
+    #OPTIONAL (default false)
+    UseSASL=true
+
+    #If you registered your bot with a service like Nickserv on freenode.
+    #Also being used when UseSASL=true
+    #OPTIONAL
+    NickServNick="username"
+    NickServPassword="password"
+
+    #Nicks you want to ignore.
+    #Messages from those users will not be sent to other bridges.
+    #OPTIONAL
+    IgnoreNicks="cord build-kitteh git-kitteh build-kitteh_ git-kitteh_ Shocky spammer"
+
+    # RemoteNickFormat defines how remote users appear on this bridge
+    # The string "{NICK}" (case sensitive) will be replaced by the actual nick / username.
+    # The string "{BRIDGE}" (case sensitive) will be replaced by the sending bridge
+    # The string "{LABEL}" (case sensitive) will be replaced by Label= field of the sending bridge
+    # The string "{PROTOCOL}" (case sensitive) will be replaced by the protocol used by the bridge
+    # The string "{NOPINGNICK}" (case sensitive) will be replaced by the actual nick / username, but with a ZWSP inside the nick, so the irc user with the same nick won't get pinged. See https://github.com/42wim/matterbridge/issues/175 for more information
+    #OPTIONAL (default empty)
+    # RemoteNickFormat="<\u0002{NOPINGNICK}\u0002> "
+    RemoteNickFormat="<\u0002{NOPINGNICK}\u0002> "
+
+    ShowJoinPart=true
+    NoSendJoinPart=true
+
+    #StripNick only allows alphanumerical nicks. See https://github.com/42wim/matterbridge/issues/285
+    #It will strip other characters from the nick
+    #OPTIONAL (default false)
+    StripNick=false
+
+    Label="esper"
+###################################################################
+#discord section
+###################################################################
+[discord.ailab]
+    #Token to connect with Discord API
+    #You can get your token by following the instructions on
+    #https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token
+    #If you want roles/groups mentions to be shown with names instead of ID, you'll need to give your bot the "Manage Roles" permission.
+    #REQUIRED
+    Token=""
+
+    #REQUIRED
+    Server="AI Lab"
+
+    #Disable sending of edits to other bridges
+    #OPTIONAL (default false)
+    EditDisable=false
+
+    #Message to be appended to every edited message
+    #OPTIONAL (default empty)
+    EditSuffix=" (edited)"
+
+    #Nicks you want to ignore.
+    #Messages from those users will not be sent to other bridges.
+    #OPTIONAL
+    IgnoreNicks="[cord] ircspammer2"
+
+    #Enable to show users joins/parts from other bridges
+    #Only works hiding/show messages from irc and mattermost bridge for now
+    #OPTIONAL (default false)
+    ShowJoinPart=true
+
+    # RemoteNickFormat="<**{NOPINGNICK}**> "
+    # RemoteNickFormat="`{LABEL}` <**{NOPINGNICK}**> "
+    # RemoteNickFormat="<**{NOPINGNICK}**> "
+    RemotenickFormat="**{NOPINGNICK}**: "
+
+    # extra label that can be used in the RemoteNickFormat
+    # optional (default empty)
+    Label="AI Lab"
+
+    #StripNick only allows alphanumerical nicks. See https://github.com/42wim/matterbridge/issues/285
+    #It will strip other characters from the nick
+    #OPTIONAL (default false)
+#    StripNick=false
+
+###################################################################
+#API
+###################################################################
+[api]
+[api.local_1]
+    BindAddress="0.0.0.0:4242"
+    #OPTIONAL (no authorization if token is empty)
+#    Token="mytoken"
+    Buffer=1000
+    RemoteNickFormat="{NICK}"
+    ShowJoinPart = true
+
+[api.local_2]
+    BindAddress="0.0.0.0:4343"
+    #OPTIONAL (no authorization if token is empty)
+#    Token=""
+    Buffer=1000
+    RemoteNickFormat="{NICK}"
+    ShowJoinPart = true
+# [general]
+    # RemoteNickFormat defines how remote users appear on this bridge
+    # The string "{NICK}" (case sensitive) will be replaced by the actual nick / username.
+    # The string "{BRIDGE}" (case sensitive) will be replaced by the sending bridge
+    # The string "{LABEL}" (case sensitive) will be replaced by Label= field of the sending bridge
+    # The string "{PROTOCOL}" (case sensitive) will be replaced by the protocol used by the bridge
+    # OPTIONAL (default empty)
+    # RemoteNickFormat="{NICK}"
+    # Label="fallback"
+
+[[gateway]]
+name="matterbridgetest"
+enable=true
+    [[gateway.inout]]
+    account="irc.esper"
+    channel="#matterbridgetest"
+        [gateway.in.options]
+        #OPTIONAL - your irc / xmpp channel key
+        key="bridges"
+
+    [[gateway.inout]]
+    account="discord.ailab"
+    channel="bridgetest"
+
+    [[gateway.inout]]
+    account="discord.ailab"
+    channel="webhooktest"
+        #OPTIONAL - webhookurl only works for discord (it needs a different URL for each cahnnel)
+        [gateway.inout.options]
+        webhookurl="https://discordapp.com/api/webhooks/1234567890"
+
+
+    [[gateway.inout]]
+    account="api.local_1"
+    channel="api"
+
+    [[gateway.inout]]
+    account="api.local_2"
+    channel="api"
+#[[gateway]]
+#name="matterlink"
+#enable=true
+#    [[gateway.inout]]
+#    account="irc.esper"
+#    channel="#matterlink"
+#
+#    # [[gateway.inout]]
+#    # account="irc.twitch"
+#    # channel="#NikkyAi"
+#
+#    [[gateway.inout]]
+#    account="discord.ailab"
+#    channel="matterlink"
