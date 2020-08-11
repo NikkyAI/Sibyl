@@ -11,9 +11,9 @@
             <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger .\(%file:%line\) - %msg%n</pattern>
         </encoder>
     </appender>
-    <appender name="ASYNC-FILE" class="ch.qos.logback.classic.AsyncAppender">
-        <appender-ref ref="FILE" />
-    </appender>
+<!--    <appender name="ASYNC-FILE" class="ch.qos.logback.classic.AsyncAppender">-->
+<!--        <appender-ref ref="FILE" />-->
+<!--    </appender>-->
 
     <!-- additivity=false ensures log messages only goes to the log file -->
 <!--
@@ -34,6 +34,6 @@
 
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="ASYNC-FILE"/>
+        <appender-ref ref="FILE"/>
     </root>
 </configuration>

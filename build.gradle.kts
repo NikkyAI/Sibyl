@@ -20,14 +20,15 @@ dependencies {
     implementation(KotlinX.coroutines.core)
 
     implementation(Ktor.client.core)
-    implementation(Ktor.client.cio)
     implementation(Ktor.client.okHttp)
     implementation(Ktor.client.jetty)
+    implementation(Ktor.client.apache)
     implementation(Ktor.client.json)
     implementation(Ktor.client.serialization)
     implementation(Ktor.client.websockets)
 
 //    implementation("com.github.kittinunf.fuel:fuel:3.x-SNAPSHOT")
+    implementation("joda-time:joda-time:_")
 
     implementation("io.github.microutils:kotlin-logging:_")
     implementation("ch.qos.logback:logback-classic:_")
