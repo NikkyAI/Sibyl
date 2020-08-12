@@ -88,8 +88,8 @@
 ###################################################################
 #API
 ###################################################################
-[api]
-[api.local_1]
+[sibyl.api]
+[sibyl.api.local_1]
     BindAddress="0.0.0.0:4242"
     #OPTIONAL (no authorization if token is empty)
 #    Token="mytoken"
@@ -97,7 +97,7 @@
     RemoteNickFormat="{NICK}"
     ShowJoinPart = true
 
-[api.local_2]
+[sibyl.api.local_2]
     BindAddress="0.0.0.0:4343"
     #OPTIONAL (no authorization if token is empty)
 #    Token=""
@@ -133,16 +133,16 @@ enable=true
     channel="webhooktest"
         #OPTIONAL - webhookurl only works for discord (it needs a different URL for each cahnnel)
         [gateway.inout.options]
-        webhookurl="https://discordapp.com/api/webhooks/1234567890"
+        webhookurl="https://discordapp.com/sibyl.api/webhooks/1234567890"
 
 
     [[gateway.inout]]
-    account="api.local_1"
-    channel="api"
+    account="sibyl.api.local_1"
+    channel="sibyl.api"
 
     [[gateway.inout]]
-    account="api.local_2"
-    channel="api"
+    account="sibyl.api.local_2"
+    channel="sibyl.api"
 #[[gateway]]
 #name="matterlink"
 #enable=true

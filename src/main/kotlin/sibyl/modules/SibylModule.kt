@@ -1,8 +1,7 @@
-package modules
+package sibyl.modules
 
-import api.ApiMessage
-import com.github.ajalt.clikt.core.CliktCommand
-import commands.SibylCommand
+import sibyl.api.ApiMessage
+import sibyl.commands.SibylCommand
 
 abstract class SibylModule(
     val name: String,

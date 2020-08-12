@@ -1,6 +1,6 @@
-package modules.test
+package sibyl.modules.test
 
-import modules.SibylModule
+import sibyl.modules.SibylModule
 
 class TestModule : SibylModule(name = "test") {
     override val commands = listOf(

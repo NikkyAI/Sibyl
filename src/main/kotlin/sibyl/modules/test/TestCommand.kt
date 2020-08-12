@@ -1,13 +1,13 @@
-package modules.test
+package sibyl.modules.test
 
-import api.ApiMessage
-import com.github.ajalt.clikt.core.CliktCommand
+import sibyl.api.ApiMessage
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.restrictTo
-import commands.SibylCommand
+import sibyl.commands.SibylCommand
+import kotlinx.coroutines.channels.SendChannel
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -20,7 +20,7 @@ class TestCommand : SibylCommand(
         subcommands(Subcommand(), MessageCommand(), OptionCommand())
     }
     //    val numberArg by argument().int()
-    override fun run(message: ApiMessage) {
+    override fun run() {
         val subcommand = currentContext.invokedSubcommand
         if (subcommand == null) {
             logger.info { "invoked without a subcommand" }
@@ -35,7 +35,7 @@ class TestCommand : SibylCommand(
         help = "subs stuff"
     ) {
         val numberArg by argument().int()
-        override fun run(message: ApiMessage) {
+        override fun run() {
             logger.info { "issuing messages" }
             echo("sub $numberArg")
         }
@@ -45,7 +45,7 @@ class TestCommand : SibylCommand(
         name = "msg",
         help = "messages stuff"
     ) {
-        override fun run(message: ApiMessage) {
+        override fun run() {
             logger.info { "issuing messages" }
             echo("message")
             echo("message2")
@@ -63,7 +63,7 @@ class TestCommand : SibylCommand(
         val e by option("-e").flag()
         val f by option("-f").counted()
         val g by option(help = "multiline\nhelp\nstring").switch("-g" to "G", "--gg" to "GG")
-        override fun run(message: ApiMessage) {
+        override fun run() {
             logger.info { "issuing messages" }
             echo("option $a")
         }

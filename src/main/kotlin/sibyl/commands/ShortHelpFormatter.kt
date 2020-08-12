@@ -1,4 +1,4 @@
-package commands
+package sibyl.commands
 
 import com.github.ajalt.clikt.output.CliktHelpFormatter
 import com.github.ajalt.clikt.output.HelpFormatter
@@ -152,18 +152,24 @@ class ShortHelpFormatter(
         epilog: String,
         parameters: List<HelpFormatter.ParameterHelp>,
         programName: String
-    ): String = if (verbose) {
-        super.formatHelp(
-            prolog = prolog,
-            epilog = epilog,
-            parameters = parameters,
-            programName = programName
-        )
-    } else {
-        super.formatUsage(
-            parameters = parameters,
-            programName = programName
-        )
+    ): String {
+        logger.info { "verbose: $verbose" }
+        return if (verbose) {
+            super.formatHelp(
+                prolog = prolog,
+                epilog = epilog,
+                parameters = parameters,
+                programName = programName
+            )
+        } else {
+            val prefix = prolog.lines().firstOrNull()?.takeIf { it.isNotBlank() }?.let {
+                "$it | "
+            } ?: ""
+            prefix + super.formatUsage(
+                parameters = parameters,
+                programName = programName
+            )
+        }
     }
 
 

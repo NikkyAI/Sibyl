@@ -1,4 +1,4 @@
-package commands
+package sibyl.commands
 
 import com.github.ajalt.clikt.output.CliktConsole
 import mu.KotlinLogging

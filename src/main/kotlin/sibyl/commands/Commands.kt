@@ -1,8 +1,8 @@
-package commands
+package sibyl.commands
 
-import api.ApiMessage
+import sibyl.api.ApiMessage
 import com.github.ajalt.clikt.core.*
-import modules.test.TestCommand
+import kotlinx.coroutines.channels.SendChannel
 import mu.KotlinLogging
 import org.joda.time.DateTime
 import java.util.regex.Matcher
@@ -21,26 +21,30 @@ fun String.asMessage() = ApiMessage(
 
 fun SibylCommand.runCommand(
     commandPrefix: String,
-    message: ApiMessage
+    message: ApiMessage,
+    sendChannel: SendChannel<ApiMessage>,
+    bufferConsole: BufferConsole = BufferConsole()
 ) {
-    val bufferConsole = BufferConsole()
     try {
         exec(
             commandPrefix = commandPrefix,
             message = message,
+            sendChannel = sendChannel,
             customConsole = bufferConsole
         )
         logger.info { "execution finished\n" }
     } catch (e: PrintHelpMessage) {
         e.command.also { cmd ->
-            logger.info { "commandHelp: \n${cmd.commandHelp}" }
-            logger.info { "getFormattedHelp(): \n${cmd.getFormattedHelp()}" }
+//            logger.info { "commandHelp: \n${cmd.commandHelp}" }
+//            logger.info { "getFormattedHelp(): \n${cmd.getFormattedHelp()}" }
+            bufferConsole.stdOutBuilder.appendln(cmd.getFormattedHelp().trim())
         }
     } catch (e: IllegalArgumentException) {
         logger.catching(e)
     } catch (e: UsageError) {
         logger.warn { e.helpMessage() }
         logger.warn { e.localizedMessage }
+        bufferConsole.stdOutBuilder.appendln(e.helpMessage())
         logger.catching(e)
     } catch (e: ProgramResult) {
         logger.info(e) { "statusCode: ${e.statusCode}" }
@@ -51,9 +55,6 @@ fun SibylCommand.runCommand(
     } catch (e: Abort) {
         logger.error(e) { "Abort" }
     }
-
-    logger.info { "stdout: ${bufferConsole.stdOutBuilder}" }
-    logger.info { "stderr: ${bufferConsole.stdErrBuilder}" }
 }
 
 private val SHELL_PATTERN = Pattern.compile("\"(\\\"|[^\"])*?\"|[^ ]+", Pattern.MULTILINE or Pattern.CASE_INSENSITIVE)

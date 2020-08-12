@@ -1,6 +1,6 @@
-package api
+package sibyl.api
 
-import jsonSerializer
+import sibyl.jsonSerializer
 import kotlinx.serialization.Serializable
 
 /**

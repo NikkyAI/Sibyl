@@ -1,10 +1,11 @@
-package modules.test
+package sibyl.modules.test
 
-import api.ApiMessage
+import sibyl.api.ApiMessage
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.arguments.transformAll
-import commands.SibylCommand
+import sibyl.commands.SibylCommand
+import kotlinx.coroutines.channels.SendChannel
 
 class EchoCommand : SibylCommand(
     name = "echo",
@@ -13,7 +14,7 @@ class EchoCommand : SibylCommand(
     val words by argument("words").multiple().transformAll { words ->
         words.joinToString(" ")
     }
-    override fun run(message: ApiMessage) {
+    override fun run() {
         echo(words)
     }
 }
