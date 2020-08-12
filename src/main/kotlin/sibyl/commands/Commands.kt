@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.core.*
 import kotlinx.coroutines.channels.SendChannel
 import mu.KotlinLogging
 import org.joda.time.DateTime
+import sibyl.removeBlankLines
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -44,7 +45,7 @@ fun SibylCommand.runCommand(
     } catch (e: UsageError) {
         logger.warn { e.helpMessage() }
         logger.warn { e.localizedMessage }
-        bufferConsole.stdOutBuilder.appendln(e.helpMessage())
+        bufferConsole.stdOutBuilder.appendln(e.helpMessage().removeBlankLines())
         logger.catching(e)
     } catch (e: ProgramResult) {
         logger.info(e) { "statusCode: ${e.statusCode}" }
