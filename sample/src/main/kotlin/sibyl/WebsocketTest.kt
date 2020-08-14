@@ -30,7 +30,7 @@ val jsonSerializerCompact = Json {
 val ApiMessage.frame: Frame.Text
     get() = Frame.Text(jsonSerializerCompact.stringify(ApiMessage.serializer(), this))
 
-object Main {
+object WebsocketTest {
     private val logger = KotlinLogging.logger {}
 
     @ExperimentalCoroutinesApi

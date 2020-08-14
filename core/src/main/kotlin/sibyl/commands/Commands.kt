@@ -4,21 +4,11 @@ import sibyl.api.ApiMessage
 import com.github.ajalt.clikt.core.*
 import kotlinx.coroutines.channels.SendChannel
 import mu.KotlinLogging
-import org.joda.time.DateTime
 import sibyl.removeBlankLines
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 private val logger = KotlinLogging.logger {}
-
-fun String.asMessage() = ApiMessage(
-    username = "Tester",
-    text = this,
-    gateway = "testgateway",
-    timestamp = DateTime.now().toString(),
-    channel = "api",
-    userid = "testUser"
-)
 
 fun SibylCommand.runCommand(
     commandPrefix: String,

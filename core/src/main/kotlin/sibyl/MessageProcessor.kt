@@ -2,7 +2,6 @@ package sibyl
 
 import sibyl.api.ApiMessage
 import sibyl.commands.BufferConsole
-import sibyl.commands.asMessage
 import sibyl.commands.runCommand
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.SendChannel
@@ -122,8 +121,9 @@ class MessageProcessor {
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-fun main(args: Array<String>) = runBlocking {
+fun main(vararg args: String) = runBlocking {
     val logger = KotlinLogging.logger {}
+    logger.info { "args: ${args.joinToString()}" }
     val msgProcessor = MessageProcessor()
     msgProcessor.addModule(TestModule())
     val outgoing = channelFlow<ApiMessage> {

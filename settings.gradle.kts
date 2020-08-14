@@ -11,3 +11,6 @@ bootstrapRefreshVersionsAndDependencies(
 )
 
 rootProject.name = "Sibyl"
+include(":core")
+include(":polling-client")
+include(":sample")
