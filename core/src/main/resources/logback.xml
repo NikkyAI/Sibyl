@@ -1,0 +1,43 @@
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <encoder>
+            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger .\(%file:%line\) - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+        <file> logs/latest.log </file>
+        <append>false</append>
+        <encoder>
+            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger .\(%file:%line\) - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <!--    no file:line with async-->
+    <!--    <appender name="ASYNC-FILE" class="ch.qos.logback.classic.AsyncAppender">-->
+    <!--        <appender-ref ref="FILE" />-->
+    <!--    </appender>-->
+
+    <!-- additivity=false ensures log messages only goes to the log file -->
+    <!--
+        <sibyl.getLogger name="libomv" level="INFO" additivity="false">
+            <appender-ref ref="ASYNC-FILE"/>
+        </sibyl.getLogger>
+        <sibyl.getLogger name="libomv" level="ERROR" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+        </sibyl.getLogger>
+    -->
+
+    <!-- custom logging levels -->
+    <logger name="sibyl" level="DEBUG" />
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+</configuration>

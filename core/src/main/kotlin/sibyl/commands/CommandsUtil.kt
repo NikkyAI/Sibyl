@@ -2,7 +2,6 @@ package sibyl.commands
 
 import sibyl.api.ApiMessage
 import com.github.ajalt.clikt.core.*
-import kotlinx.coroutines.channels.SendChannel
 import mu.KotlinLogging
 import sibyl.removeBlankLines
 import java.util.regex.Matcher
@@ -13,14 +12,14 @@ private val logger = KotlinLogging.logger {}
 fun SibylCommand.runCommand(
     commandPrefix: String,
     message: ApiMessage,
-    sendChannel: SendChannel<ApiMessage>,
+//    sendChannel: SendChannel<ApiMessage>,
     bufferConsole: BufferConsole = BufferConsole()
 ) {
     try {
         exec(
             commandPrefix = commandPrefix,
             message = message,
-            sendMessage = sendChannel,
+//            sendMessage = sendChannel,
             customConsole = bufferConsole
         )
         logger.info { "execution finished\n" }
@@ -32,6 +31,7 @@ fun SibylCommand.runCommand(
         }
     } catch (e: IllegalArgumentException) {
         logger.catching(e)
+        bufferConsole.stdOutBuilder.appendln("Error: " + e.localizedMessage)
     } catch (e: UsageError) {
         logger.warn { e.helpMessage() }
         logger.warn { e.localizedMessage }

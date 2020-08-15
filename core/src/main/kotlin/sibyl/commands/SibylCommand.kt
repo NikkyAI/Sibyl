@@ -76,15 +76,4 @@ abstract class SibylCommand(
         logger.info { "executing: $commandPrefix$commandName $argv" }
         parse(argv)
     }
-
-//    override fun run() {
-//        // find message context on root command
-//        logger.info { "message: $message" }
-//        run(
-//            message = message,
-//            sendChannel = sendChannel
-//        )
-//    }
-
-//    abstract fun run(message: ApiMessage, sendChannel: SendChannel<ApiMessage>)
 }

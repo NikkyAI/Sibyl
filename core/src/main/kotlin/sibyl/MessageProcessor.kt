@@ -1,10 +1,7 @@
 package sibyl
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import sibyl.api.ApiMessage
 import sibyl.core.CoreModule
@@ -21,24 +18,13 @@ class MessageProcessor {
     internal var modules: List<SibylModule> = listOf()
         private set
 
-//    // outgoing
-//    private var outputTranforms: List<(ApiMessage) -> ApiMessage> = listOf() // TODO: move into module ?
-//
-//    // incoming
-//    private var interceptors: List<(ApiMessage) -> Unit> = listOf() // TODO: move into module ?
-//    private var filters: List<(ApiMessage) -> Boolean> = listOf() // TODO: move into module ?
+    private val incomingPipeline = Pipeline<ApiMessage>()
+    private val outgoingPipeline = Pipeline<ResponseMessage>(reversed = true)
 
-    private val incomingPipeline = Pipeline()
-    private val outgoingPipeline = Pipeline(-1)
-    // TODO: pipeline with dynamic amount of stages
-    // TODO: (ApiMessage) -> ApiMessage?
-    // TODO: make commands a interceptor on a defined step/stage
-
-    internal val userid = "sibyl.${UUID.randomUUID()}"
+    internal val userid = "sibyl.${UUID.randomUUID().toString().substringBefore('-')}"
 
     init {
         addModule(CoreModule(this))
-
     }
 
     @OptIn(ExperimentalStdlibApi::class)
@@ -56,27 +42,31 @@ class MessageProcessor {
 
         newModule.init(
             messageProcessor = this,
-            sendMessage = { message: ApiMessage ->
+            sendResponse = { response: ResponseMessage, stage: Stage? ->
                 // TODO: pass in output buffer ?
-                val transformedMessage = outgoingPipeline.process(message)
-                if(transformedMessage != null) {
-                    sendChannel.send(transformedMessage)
+                val transformedResponse = if(stage != null) outgoingPipeline.process(response, stage) else  outgoingPipeline.process(response)
+                if(transformedResponse != null) {
+                    logger.info {"response from ${transformedResponse.from}"}
+                    sendChannel.send(transformedResponse.message)
                 }
             }
         )
         modules += newModule
     }
 
-    fun registerIncomingInterceptor(stage: Stage, interceptor: Interceptor) {
+    fun registerIncomingInterceptor(stage: Stage, interceptor: Interceptor<ApiMessage>) {
         incomingPipeline.registerInterceptor(stage, interceptor)
     }
 
-    fun registerOutgoingInterceptor(stage: Stage, interceptor: Interceptor) {
+    fun registerOutgoingInterceptor(stage: Stage, interceptor: Interceptor<ResponseMessage>) {
         outgoingPipeline.registerInterceptor(stage, interceptor)
     }
 
     suspend fun start(send: SendChannel<ApiMessage>, receive: Flow<ApiMessage>) {
         sendChannel = send
+        modules.forEach { module ->
+            module.start()
+        }
         receive.filter { msg ->
             msg.userid != userid
         }.onEach { msg ->
@@ -95,47 +85,3 @@ class MessageProcessor {
     }
 }
 
-
-@OptIn(ExperimentalCoroutinesApi::class)
-fun main(vararg args: String) = runBlocking {
-    val logger = KotlinLogging.logger {}
-    logger.info { "args: ${args.joinToString()}" }
-    val msgProcessor = MessageProcessor()
-//    msgProcessor.addModule(TestModule())
-    val outgoing = channelFlow<ApiMessage> {
-        listOf(
-//        "!sibyl.commands",
-            "!test",
-            "!test --help",
-            "!test sub --help",
-            "!test",
-//            "!test sub 42",
-//            "!test msg",
-            "!test opt --help",
-            "!test opt -t 20",
-            "!test opt --test 23",
-            "!help test opt",
-//            "!help test opt",
-            "!help test",
-//            "!help test -v",
-            "!commands",
-            "!whoami",
-            "!echo hello world"
-        )
-            .map {
-                logger.info { it }
-                it.asMessage()
-            }
-            .forEach { msg ->
-                msgProcessor.process(msg)
-                delay(100)
-            }
-    }
-    outgoing.collect { message ->
-        logger.debug { "(not) sending: $message" }
-        logger.info { message.text }
-        if (message.text.lines().size > 1) {
-            logger.error { "output lines: ${message.text.lines().size}" }
-        }
-    }
-}

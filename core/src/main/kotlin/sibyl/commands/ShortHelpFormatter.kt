@@ -3,6 +3,7 @@ package sibyl.commands
 import com.github.ajalt.clikt.output.CliktHelpFormatter
 import com.github.ajalt.clikt.output.HelpFormatter
 import mu.KotlinLogging
+import sibyl.withIndent
 
 class ShortHelpFormatter(
     var verbose: Boolean = false,
@@ -263,9 +264,6 @@ class ShortHelpFormatter(
             }
         }
     }
-
-    fun String.withIndent(indent: String, subsequentIndent: String = indent) =
-        indent + lines().joinToString("\n$subsequentIndent")
 
     private fun StringBuilder.section(title: String) {
         //append("\n")

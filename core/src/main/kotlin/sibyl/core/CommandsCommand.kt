@@ -1,4 +1,4 @@
-package sibyl.modules.core
+package sibyl.core
 
 import sibyl.MessageProcessor
 import sibyl.api.ApiMessage

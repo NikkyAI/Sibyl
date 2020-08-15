@@ -1,4 +1,4 @@
-package sibyl.modules.core
+package sibyl.core
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.PrintHelpMessage

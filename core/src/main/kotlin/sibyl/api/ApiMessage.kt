@@ -2,6 +2,7 @@ package sibyl.api
 
 import sibyl.jsonSerializerPretty
 import kotlinx.serialization.Serializable
+import org.joda.time.DateTime
 
 /**
  * Created by nikky on 07/05/18.
@@ -14,7 +15,8 @@ data class ApiMessage(
     var username: String = "",
     var text: String = "",
     var gateway: String = "",
-    var timestamp: String = "",
+    @Serializable(with = DateTimeSerializer::class)
+    var timestamp: DateTime = DateTime.now(),
     var channel: String = "",
     var userid: String = "",
     var avatar: String = "",
