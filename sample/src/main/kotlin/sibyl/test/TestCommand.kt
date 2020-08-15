@@ -1,13 +1,11 @@
-package sibyl.modules.test
+package sibyl.test
 
-import sibyl.api.ApiMessage
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.restrictTo
 import sibyl.commands.SibylCommand
-import kotlinx.coroutines.channels.SendChannel
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}

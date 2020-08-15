@@ -1,10 +1,11 @@
 package sibyl
 
+import LogModule
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.features.websocket.*
 import kotlinx.coroutines.*
-import sibyl.modules.test.TestModule
+import sibyl.test.TestModule
 import mu.KotlinLogging
 import sibyl.client.PollingClient
 
@@ -18,6 +19,7 @@ fun main(args: Array<String>) {
     }
 
     val messageProcessor = MessageProcessor().apply {
+        addModule(LogModule())
         addModule(TestModule())
     }
 

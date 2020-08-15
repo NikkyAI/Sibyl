@@ -4,6 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
+import io.ktor.content.*
 import io.ktor.http.ContentType
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
@@ -18,9 +19,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.builtins.list
+import mu.KotlinLogging
 import sibyl.api.ApiMessage
+import sibyl.jsonSerializer
 
 object PollingClient {
+    private val logger = KotlinLogging.logger {}
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun connect(
         client: HttpClient,
@@ -36,7 +40,7 @@ object PollingClient {
                     header("Authorization", "Bearer $token")
                 }
             }
-            jsonSerializerCompact.parse(ApiMessage.serializer().list, json)
+            jsonSerializer.parse(ApiMessage.serializer().list, json)
         } ?: error("cannot connect")
 
         val receiveFlow = channelFlow<ApiMessage> {
@@ -51,7 +55,7 @@ object PollingClient {
                             header("Authorization", "Bearer $token")
                         }
                     }
-                    jsonSerializerCompact.parse(ApiMessage.serializer().list, json)
+                    jsonSerializer.parse(ApiMessage.serializer().list, json)
                 }
                 messages?.forEach {
                     logger.info { "received $it" }
@@ -71,7 +75,7 @@ object PollingClient {
                         header("Authorization", "Bearer $token")
                     }
                     body = TextContent(
-                        text = jsonSerializerCompact.stringify(ApiMessage.serializer(), message),
+                        text = jsonSerializer.stringify(ApiMessage.serializer(), message),
                         contentType = ContentType.Application.Json
                     )
                 }

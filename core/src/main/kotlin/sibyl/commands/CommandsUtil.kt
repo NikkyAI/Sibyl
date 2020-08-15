@@ -20,7 +20,7 @@ fun SibylCommand.runCommand(
         exec(
             commandPrefix = commandPrefix,
             message = message,
-            sendChannel = sendChannel,
+            sendMessage = sendChannel,
             customConsole = bufferConsole
         )
         logger.info { "execution finished\n" }

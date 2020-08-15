@@ -3,7 +3,7 @@ package sibyl
 import org.joda.time.DateTime
 import sibyl.api.ApiMessage
 
-fun String.removeBlankLines() = lineSequence().filter { it.isNotBlank() }.joinToString("\n")
+fun String.removeBlankLines() = lineSequence().filter(String::isNotBlank).joinToString("\n")
 
 fun String.asMessage() = ApiMessage(
     username = "Tester",

@@ -1,6 +1,6 @@
 package sibyl.api
 
-import sibyl.jsonSerializer
+import sibyl.jsonSerializerPretty
 import kotlinx.serialization.Serializable
 
 /**
@@ -26,7 +26,7 @@ data class ApiMessage(
     var Extra: Map<String, String>? = null
 ) {
     override fun toString(): String {
-        return jsonSerializer.stringify(serializer(), this)
+        return jsonSerializerPretty.stringify(serializer(), this)
     }
 
     companion object {

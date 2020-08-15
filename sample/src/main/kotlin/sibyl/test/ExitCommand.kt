@@ -1,20 +1,17 @@
-package sibyl.modules.test
+package sibyl.test
 
-import sibyl.api.ApiMessage
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.arguments.transformAll
 import sibyl.commands.SibylCommand
-import kotlinx.coroutines.channels.SendChannel
+import kotlin.system.exitProcess
 
-class EchoCommand : SibylCommand(
-    name = "echo",
+class ExitCommand : SibylCommand(
+//    name = "exit",
     invokeWithoutSubcommand = true
 ) {
-    val words by argument("words").multiple().transformAll { words ->
-        words.joinToString(" ")
-    }
     override fun run() {
-        echo(words)
+        require(message.username == "Nikky") {"needs to be sent by admin"}
+        exitProcess(0)
     }
 }

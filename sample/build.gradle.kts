@@ -6,6 +6,7 @@ plugins {
 dependencies {
     implementation(project(":core"))
     implementation(project(":polling-client"))
+    implementation(project(":module:logging"))
 
     implementation("io.github.microutils:kotlin-logging:_")
     implementation("ch.qos.logback:logback-classic:_")
@@ -21,4 +22,11 @@ dependencies {
 
 application {
     mainClassName = "sibyl.MainKt"
+}
+
+tasks {
+    val run by existing(JavaExec::class) {
+        workingDir = rootDir.resolve("run")
+        workingDir.mkdirs()
+    }
 }

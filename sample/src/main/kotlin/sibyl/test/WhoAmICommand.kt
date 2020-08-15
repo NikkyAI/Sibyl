@@ -1,8 +1,6 @@
-package sibyl.modules.test
+package sibyl.test
 
-import sibyl.api.ApiMessage
 import sibyl.commands.SibylCommand
-import kotlinx.coroutines.channels.SendChannel
 
 class WhoAmICommand : SibylCommand(
     name = "whoami",

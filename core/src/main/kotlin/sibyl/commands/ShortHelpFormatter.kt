@@ -162,7 +162,7 @@ class ShortHelpFormatter(
                 programName = programName
             )
         } else {
-            val prefix = prolog.lines().firstOrNull()?.takeIf { it.isNotBlank() }?.let {
+            val prefix = prolog.lines().firstOrNull()?.takeIf(String::isNotBlank)?.let {
                 "$it | "
             } ?: ""
             prefix + super.formatUsage(

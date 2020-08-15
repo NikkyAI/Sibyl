@@ -4,14 +4,11 @@ import sibyl.api.ApiMessage
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.PrintHelpMessage
 import com.github.ajalt.clikt.core.context
-import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.output.CliktConsole
 import com.github.ajalt.clikt.parameters.options.eagerOption
-import com.github.ajalt.clikt.parameters.options.flag
-import com.github.ajalt.clikt.parameters.options.option
 import kotlinx.coroutines.channels.SendChannel
 import mu.KotlinLogging
-import sibyl.modules.core.HelpCommand
+import sibyl.core.HelpCommand
 
 abstract class SibylCommand(
     help: String = "",
@@ -30,7 +27,7 @@ abstract class SibylCommand(
     invokeWithoutSubcommand = invokeWithoutSubcommand,
     printHelpOnEmptyArgs = printHelpOnEmptyArgs,
     helpTags = helpTags,
-    autoCompleteEnvvar = autoCompleteEnvvar,
+    autoCompleteEnvvar = null,
     allowMultipleSubcommands = allowMultipleSubcommands,
     treatUnknownOptionsAsArgs = treatUnknownOptionsAsArgs
 ) {
@@ -39,16 +36,17 @@ abstract class SibylCommand(
     }
 
     private lateinit var messageContext: ApiMessage
-    private lateinit var sendChannelContext: SendChannel<ApiMessage>
-
     val message: ApiMessage
         get() =
             (currentContext.findRoot().command as? SibylCommand)?.messageContext ?: messageContext
             ?: error("cannot find message context")
-    val sendChannel: SendChannel<ApiMessage>
-        get() =
-            (currentContext.findRoot().command as? SibylCommand)?.sendChannelContext ?: sendChannelContext
-            ?: error("cannot find sendchannel")
+
+//    private lateinit var sendChannelContext: SendChannel<ApiMessage>
+//    @Deprecated("try not to send messages this way ?")
+//    val sendChannel: SendChannel<ApiMessage>
+//        get() =
+//            (currentContext.findRoot().command as? SibylCommand)?.sendChannelContext ?: sendChannelContext
+//            ?: error("cannot find sendchannel")
 
     init {
         eagerOption("-H", "--HELP", hidden = true) {
@@ -64,7 +62,7 @@ abstract class SibylCommand(
     internal fun exec(
         commandPrefix: String,
         message: ApiMessage,
-        sendChannel: SendChannel<ApiMessage>,
+//        sendMessage: SendChannel<ApiMessage>,
         customConsole: CliktConsole
     ) {
         context {
@@ -73,7 +71,7 @@ abstract class SibylCommand(
         }
 
         messageContext = message
-        sendChannelContext = sendChannel
+//        sendChannelContext = sendMessage
         val argv = message.text.substringAfter(commandPrefix + commandName).shellSplit()
         logger.info { "executing: $commandPrefix$commandName $argv" }
         parse(argv)

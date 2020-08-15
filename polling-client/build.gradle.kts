@@ -16,4 +16,7 @@ dependencies {
     implementation(Ktor.client.json)
     implementation(Ktor.client.serialization)
     implementation(Ktor.client.websockets)
+
+    implementation("io.github.microutils:kotlin-logging:_")
+    implementation("ch.qos.logback:logback-classic:_")
 }
