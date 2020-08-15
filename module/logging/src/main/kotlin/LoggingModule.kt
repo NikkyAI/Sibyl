@@ -11,12 +11,12 @@ class LoggingModule(
         val prefix = "${message.timestamp.toString(dtf)} <${message.username} ${message.userid}> "
         prefix + message.text.withIndent("", " ".repeat(prefix.length))
     }
-) : SibylModule("log") {
+) : SibylModule("log", "logs messages and allows you to retrieve them") {
     companion object {
         private val logger = KotlinLogging.logger {}
 
-        val LOGGING = Stage("LOGGING", 1)
-        val LOGGING_OUTGOING = Stage("LOGGING", -1)
+        // this has to be done before fixOutgoing
+        val LOGGING_OUTGOING = Stage("LOGGING", -5)
     }
 
     val logsFolder = File("logs")
@@ -26,7 +26,7 @@ class LoggingModule(
     )
 
     override fun MessageProcessor.setup() {
-        registerIncomingInterceptor(LOGGING, ::processRequest)
+        registerIncomingInterceptor(Stage.POST_FILTER, ::processRequest)
         registerOutgoingInterceptor(LOGGING_OUTGOING, ::processResponse)
     }
 

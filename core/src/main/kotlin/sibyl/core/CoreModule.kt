@@ -12,26 +12,23 @@ import sibyl.commands.BufferConsole
 import sibyl.commands.SibylCommand
 import sibyl.commands.runCommand
 
-class CoreModule(private val messageProcessor: MessageProcessor) : SibylModule("core") {
+class CoreModule(private val messageProcessor: MessageProcessor) : SibylModule("core", "core framework functionality") {
     companion object {
         private val logger = KotlinLogging.logger {}
 
         val CHECK = Stage("CHECK", 0)
         val FILTER = Stage("FILTER", 0)
-        val COMMANDS = Stage("COMMANDS", 3)
     }
 
     override val commands: List<SibylCommand> = listOf(
-        CommandsCommand(messageProcessor)
-//        HelpCommand(messageProcessor)
+        CommandsCommand(messageProcessor),
+        ModulesCommand(messageProcessor)
     )
 
     override fun MessageProcessor.setup() {
-        registerIncomingInterceptor(FILTER, ::filterIncoming)
-
-        registerOutgoingInterceptor(CHECK, ::transformOutgoing)
-
-        registerIncomingInterceptor(COMMANDS, ::processCommands)
+        registerIncomingInterceptor(Stage.FILTER, ::filterIncoming)
+        registerOutgoingInterceptor(Stage.PRE_FILTER, ::fixOutgoing)
+        registerIncomingInterceptor(Stage.COMMANDS, ::processCommands)
     }
 
     override fun start() {
@@ -67,7 +64,7 @@ class CoreModule(private val messageProcessor: MessageProcessor) : SibylModule("
         return message
     }
 
-    suspend fun transformOutgoing(response: ResponseMessage, stage: Stage): ResponseMessage? {
+    suspend fun fixOutgoing(response: ResponseMessage, stage: Stage): ResponseMessage? {
         return response.copy(
             message=response.message.run {
                 copy(

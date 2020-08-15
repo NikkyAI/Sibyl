@@ -5,6 +5,7 @@ import sibyl.commands.SibylCommand
 
 abstract class SibylModule(
     val name: String,
+    val description: String = "missing description",
     val commandPrefix: String = "!"
 ) {
     open val commands: List<SibylCommand> = listOf()

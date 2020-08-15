@@ -4,6 +4,8 @@ plugins {
 }
 
 dependencies {
+    implementation(kotlin("reflect", "_"))
+
     implementation(project(":core"))
     implementation(project(":polling-client"))
     implementation(project(":module:logging"))

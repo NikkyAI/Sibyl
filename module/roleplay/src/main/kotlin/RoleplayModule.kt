@@ -7,11 +7,9 @@ import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlin.random.nextInt
 
-class RoleplayModule : SibylModule("roleplay") {
+class RoleplayModule : SibylModule("roleplay", "throw dice and other things, only dice are implemented so far") {
     companion object {
         private val logger = KotlinLogging.logger {}
-
-        val AFTER_COMMAND = Stage("AFTER_COMMANDS", 4)
 
         const val EMPTY = ""
         const val DETAIL_ENABLE = true
@@ -22,7 +20,7 @@ class RoleplayModule : SibylModule("roleplay") {
     private val diceRegex = "\\b(\\d+)d(\\d+)(?:([v><])(\\d+))?(( )?[+-]\\d+)?\\b".toRegex()
 
     override fun MessageProcessor.setup() {
-        registerIncomingInterceptor(AFTER_COMMAND, ::processDiceRolls)
+        registerIncomingInterceptor(Stage.POST_COMMAND, ::processDiceRolls)
     }
 
     private suspend fun processDiceRolls(message: ApiMessage, stage: Stage): ApiMessage {
@@ -54,9 +52,8 @@ class RoleplayModule : SibylModule("roleplay") {
                         (dice <= DETAIL_MAX_DICE_PER_ROLL) &&
                         (totalDiceDetail <= DETAIL_MAX_TOTAL_DICE))
 
-                // Build an array of the individual dice roll results (5d20 => 5 results).
-
-                val resultList = (0 until dice).map { i -> Random.nextInt(1..sides) + diceOffset }.toMutableList()
+                // Build a list of the individual dice roll results (5d20 => 5 results).
+                val resultList = MutableList(dice) { _ -> Random.nextInt(1..sides) + diceOffset }
 
                 // Modify dice roll requirements affecting the result of the roll (but not roll.diceRolls).
                 if (drop != null) {
