@@ -1,19 +1,13 @@
 import mu.KotlinLogging
-import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.DateTimeFormatter
-import sibyl.*
+import sibyl.MessageProcessor
+import sibyl.SibylModule
+import sibyl.Stage
 import sibyl.api.ApiMessage
 import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlin.random.nextInt
 
-class RoleplayModule(
-    val dtFormat: DateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"),
-    val messageFormat: (ApiMessage, DateTimeFormatter) -> String = { message, dtf ->
-        val prefix = "${message.timestamp.toString(dtf)} <${message.username} ${message.userid}> "
-        prefix + message.text.withIndent("", " ".repeat(prefix.length))
-    }
-) : SibylModule("log") {
+class RoleplayModule : SibylModule("roleplay") {
     companion object {
         private val logger = KotlinLogging.logger {}
 
@@ -28,97 +22,72 @@ class RoleplayModule(
     private val diceRegex = "\\b(\\d+)d(\\d+)(?:([v><])(\\d+))?(( )?[+-]\\d+)?\\b".toRegex()
 
     override fun MessageProcessor.setup() {
-        registerIncomingInterceptor(AFTER_COMMAND, ::processDicerolls)
+        registerIncomingInterceptor(AFTER_COMMAND, ::processDiceRolls)
     }
 
-    override fun start() {
-    }
-
-    suspend fun processDicerolls(message: ApiMessage, stage: Stage): ApiMessage {
+    private suspend fun processDiceRolls(message: ApiMessage, stage: Stage): ApiMessage {
         val matches = diceRegex.findAll(message.text).toList()
 
         // Prepare and validate some stuff.
-        val rolls = mutableListOf<Roll>()
-        var totalDice: Int = 0
 
-        matches.forEach { match ->
-            val dice  = match.groupValues[1].toInt()
-            val sides = match.groupValues[2].toInt()
-            val drop  = if(match.groupValues[3] == "v") match.groupValues[4].toInt() else null // TODO: nullable here
-            val min   = if(match.groupValues[3] == ">") match.groupValues[4].toInt() else null
-            val max   = if(match.groupValues[3] == "<") match.groupValues[4].toInt() else null
-            val diceOffset  = (if((match.groupValues[5] != EMPTY) && (match.groupValues[6] == EMPTY)) match.groupValues[5].toInt() else 0)
-            val totalOffset = if(match.groupValues[6] != EMPTY) match.groupValues[5].replace(" ", "").toInt() else 0
-
-            totalDice += (if(dice <= 8) dice else 1)
-            rolls += Roll(
+        val rolls = matches.map { match ->
+            Roll(
                 match = match.groupValues[0],
-                dice = dice,
-                sides = sides,
-                drop = drop,
-                min = min,
-                max = max,
-                diceOffset = diceOffset,
-                totalOffset = totalOffset
+                dice = match.groupValues[1].toInt(),
+                sides = match.groupValues[2].toInt(),
+                drop = if (match.groupValues[3] == "v") match.groupValues[4].toInt() else null,
+                min = if (match.groupValues[3] == ">") match.groupValues[4].toInt() else null,
+                max = if (match.groupValues[3] == "<") match.groupValues[4].toInt() else null,
+                diceOffset = if ((match.groupValues[5] != EMPTY) && (match.groupValues[6] == EMPTY)) match.groupValues[5].toInt() else 0,
+                totalOffset = if (match.groupValues[6] != EMPTY) match.groupValues[5].replace(" ", "").toInt() else 0
             )
+        }
+
+        val totalDiceDetail = rolls.sumBy { roll ->
+            if (roll.dice <= DETAIL_MAX_DICE_PER_ROLL) roll.dice else 0
         }
 
         // Calculate each roll (1d20 1d20 1d20 => 3 rolls).
         for (roll in rolls) {
-//            val (match, dice, sides, drop, min, max, diceOffset, totalOffset) = roll
-            val dice = roll.dice
-            val sides = roll.sides
-            val drop = roll.drop
-            val min = roll.min
-            val max = roll.max
-            val diceOffset = roll.diceOffset
+            with(roll) {
+                detail = (DETAIL_ENABLE && (dice > 1) &&
+                        (dice <= DETAIL_MAX_DICE_PER_ROLL) &&
+                        (totalDiceDetail <= DETAIL_MAX_TOTAL_DICE))
 
-            roll.detail = (DETAIL_ENABLE && (dice > 1) &&
-                    (dice <= DETAIL_MAX_DICE_PER_ROLL) &&
-                    (totalDice <= DETAIL_MAX_TOTAL_DICE))
+                // Build an array of the individual dice roll results (5d20 => 5 results).
 
-            // Build an array of the individual dice roll results (5d20 => 5 results).
+                val resultList = (0 until dice).map { i -> Random.nextInt(1..sides) + diceOffset }.toMutableList()
 
-            val results = (0 until dice).map { i -> Random.nextInt(1..sides) + diceOffset }.toMutableList()
-
-                    // Modify dice roll requirements affecting the result of the roll (but not roll.diceRolls).
-            if (drop != null) {
-//                results = results.sorted()
-//                results = results.drop(drop)
-//                val toDrop = results.sorted().take(drop)
-//                results -= toDrop
-                repeat(drop) {
-                    val lowest = results.min()
-                    if(lowest != null) results -= lowest
+                // Modify dice roll requirements affecting the result of the roll (but not roll.diceRolls).
+                if (drop != null) {
+                    repeat(drop) {
+                        val lowest = resultList.min()
+                        if (lowest != null) resultList -= lowest
+                    }
                 }
+
+                if (min != null) resultList.retainAll { result -> result > min }
+                if (max != null) resultList.retainAll { result -> result < max }
+
+                // Calculate the result and average.
+                results = resultList.toList()
             }
-
-            if (min != null) results.retainAll { result -> result > min }
-            if (max != null) results.retainAll { result -> result < max }
-
-            // Calculate the result and average.
-            roll.results = results
         }
 
         // Put the response together.
         val totalResult = rolls.sumBy { it.result }
         val str = rolls.joinToString(" [+] ", "", "") { roll ->
-            val match = roll.match
-            val detail = roll.detail
-            val result = roll.result
-            val results = roll.results
-            val average = roll.average
-
-            val detailList = if (detail) {
-                results.takeIf { it.isNotEmpty() }
-                    ?.joinToString(", ", " (", ")")
-                    ?: " (none)"
-            } else ""
-            val s = "$match = $result$detailList" +
-                    if (results.size > 1) " ~ ${(average * 10).roundToInt() / 10.0}" else ""
-            s
+            with(roll) {
+                val detailList = if (detail) {
+                    results.takeIf { it.isNotEmpty() }
+                        ?.joinToString(", ", " (", ")")
+                        ?: " (none)"
+                } else ""
+                val averageString = if (results.size > 1) " ~ ${(average * 10).roundToInt() / 10.0}" else ""
+                "$match = $result$detailList$averageString"
+            }
         }
-        val response = if(matches.size > 1) "$str [=] $totalResult" else str
+        val response = if (matches.size > 1) "$str [=] $totalResult" else str
 
         sendMessage(
             ApiMessage(
