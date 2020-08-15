@@ -6,8 +6,8 @@ plugins {
 dependencies {
     implementation(kotlin("stdlib", "_"))
 
-    implementation(KotlinX.serialization.runtime)
-    implementation(KotlinX.coroutines.core)
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:_")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")
 
     implementation("io.github.microutils:kotlin-logging:_")
     implementation("ch.qos.logback:logback-classic:_")

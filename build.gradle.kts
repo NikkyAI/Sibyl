@@ -9,7 +9,7 @@ subprojects {
     repositories {
         jcenter()
         mavenCentral()
-        maven(url = "https://jitpack.io")
+        maven(url = "https://kotlin.bintray.com/ktor")
     }
 }
 

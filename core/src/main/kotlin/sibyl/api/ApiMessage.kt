@@ -28,7 +28,7 @@ data class ApiMessage(
     var Extra: Map<String, String>? = null
 ) {
     override fun toString(): String {
-        return jsonSerializerPretty.stringify(serializer(), this)
+        return jsonSerializerPretty.encodeToString(serializer(), this)
     }
 
     companion object {

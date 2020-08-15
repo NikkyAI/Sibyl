@@ -18,10 +18,10 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
-import kotlinx.serialization.builtins.list
 import mu.KotlinLogging
 import sibyl.api.ApiMessage
 import sibyl.jsonSerializer
+import kotlinx.serialization.builtins.ListSerializer
 
 object PollingClient {
     private val logger = KotlinLogging.logger {}
@@ -40,7 +40,7 @@ object PollingClient {
                     header("Authorization", "Bearer $token")
                 }
             }
-            jsonSerializer.parse(ApiMessage.serializer().list, json)
+            jsonSerializer.decodeFromString(ListSerializer(ApiMessage.serializer()), json)
         } ?: error("cannot connect")
 
         val receiveFlow = channelFlow<ApiMessage> {
@@ -55,7 +55,7 @@ object PollingClient {
                             header("Authorization", "Bearer $token")
                         }
                     }
-                    jsonSerializer.parse(ApiMessage.serializer().list, json)
+                    jsonSerializer.decodeFromString(ListSerializer(ApiMessage.serializer()), json)
                 }
                 messages?.forEach {
                     logger.info { "received $it" }
@@ -75,7 +75,7 @@ object PollingClient {
                         header("Authorization", "Bearer $token")
                     }
                     body = TextContent(
-                        text = jsonSerializer.stringify(ApiMessage.serializer(), message),
+                        text = jsonSerializer.encodeToString(ApiMessage.serializer(), message),
                         contentType = ContentType.Application.Json
                     )
                 }
