@@ -12,9 +12,6 @@ import sibyl.client.PollingClient
 private val logger = KotlinLogging.logger {}
 fun main(args: Array<String>) {
     val client = HttpClient(OkHttp) {
-//            install(JsonFeature) {
-//                serializer = KotlinxSerializer()
-//            }
         install(WebSockets)
     }
 
@@ -24,7 +21,7 @@ fun main(args: Array<String>) {
     }
 
     runBlocking {
-        val (send, receive) = PollingClient.connect(client, "localhost", 4242, token = "mytoken")
+        val (send, receive) = PollingClient.connect(client, "localhost", 4242/*, token = "mytoken"*/)
 
         logger.info { "client started" }
         messageProcessor.start(send = send, receive = receive)

@@ -1,7 +1,19 @@
-Sibyl
+## Sibyl
 
 matterbridge bot
 
+### setup
+
+TODO: publish to bintray, so i can write about how you can add it as dependency here
+
+### running the sample application
+
+start matterbridge, with api on port 4242, and no authorization token, see [matterbridge/matterbridge-sample.toml](./matterbridge/matterbridge-sample.toml)
+
+run 
+```bash
+./gradlew :sample:run
+```
 
 TODO list features
 

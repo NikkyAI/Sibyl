@@ -92,7 +92,7 @@
 [sibyl.api.local_1]
     BindAddress="0.0.0.0:4242"
     #OPTIONAL (no authorization if token is empty)
-#    Token="mytoken"
+#    Token=""
     Buffer=1000
     RemoteNickFormat="{NICK}"
     ShowJoinPart = true
@@ -100,7 +100,7 @@
 [sibyl.api.local_2]
     BindAddress="0.0.0.0:4343"
     #OPTIONAL (no authorization if token is empty)
-#    Token=""
+#    Token="mytoken"
     Buffer=1000
     RemoteNickFormat="{NICK}"
     ShowJoinPart = true
