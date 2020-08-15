@@ -1,6 +1,7 @@
 package sibyl
 
-import LogModule
+import LoggingModule
+import RoleplayModule
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.features.websocket.*
@@ -16,7 +17,8 @@ fun main(args: Array<String>) {
     }
 
     val messageProcessor = MessageProcessor().apply {
-        addModule(LogModule())
+        addModule(LoggingModule())
+        addModule(RoleplayModule())
         addModule(TestModule())
     }
 

@@ -5,7 +5,7 @@ import sibyl.*
 import sibyl.api.ApiMessage
 import java.io.File
 
-class LogModule(
+class LoggingModule(
     val dtFormat: DateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"),
     val messageFormat: (ApiMessage, DateTimeFormatter) -> String = { message, dtf ->
         val prefix = "${message.timestamp.toString(dtf)} <${message.username} ${message.userid}> "

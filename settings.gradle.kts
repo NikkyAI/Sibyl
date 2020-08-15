@@ -14,4 +14,5 @@ rootProject.name = "Sibyl"
 include(":core")
 include(":polling-client")
 include(":module:logging")
+include(":module:roleplay")
 include(":sample")

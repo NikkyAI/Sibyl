@@ -11,7 +11,7 @@ abstract class SibylModule(
 
     private lateinit var sendResponse: suspend (ResponseMessage, Stage?) -> Unit
 
-    suspend fun sendMessage(message: ApiMessage, fromCommand: SibylCommand? = null, stage: Stage? = null) {
+    suspend fun sendMessage(message: ApiMessage, stage: Stage? = null, fromCommand: SibylCommand? = null) {
         sendResponse.invoke(
             ResponseMessage(
                 message,

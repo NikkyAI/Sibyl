@@ -3,7 +3,10 @@ package sibyl
 import mu.KotlinLogging
 
 typealias Interceptor<E> = suspend (E, Stage) -> E?
-class Pipeline<MSG: Any>(val reversed: Boolean = false) {
+class Pipeline<MSG: Any>(
+    val name: String,
+    val reversed: Boolean = false
+) {
     companion object {
         private val logger = KotlinLogging.logger {}
     }
@@ -29,7 +32,7 @@ class Pipeline<MSG: Any>(val reversed: Boolean = false) {
 
         val transformedMessage = run {
             sortedInterceptors.entries.fold(message) { msg, (stage, list) ->
-                logger.info { "processing stage $stage" }
+                logger.info { "$name processing stage $stage" }
                 val orderedList = if(reversed) list.asReversed() else list
                 orderedList.fold(msg) innerFold@{ innerMsg : MSG, interceptor: Interceptor<MSG> ->
                     interceptor.invoke(innerMsg, stage)?.also {

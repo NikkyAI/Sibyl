@@ -114,7 +114,7 @@ class CoreModule(private val messageProcessor: MessageProcessor) : SibylModule("
                         )
 
                         logger.info { "sending to outgoing: $responseMessage" }
-                        sendMessage(responseMessage, command, stage)
+                        sendMessage(responseMessage, stage, command)
 //                        val processedResponseMessage = outgoingPipeline.process(responseMessage)
 //                        if(processedResponseMessage != null)  {
 //                            sendChannel.send(responseMessage)

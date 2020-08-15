@@ -18,8 +18,8 @@ class MessageProcessor {
     internal var modules: List<SibylModule> = listOf()
         private set
 
-    private val incomingPipeline = Pipeline<ApiMessage>()
-    private val outgoingPipeline = Pipeline<ResponseMessage>(reversed = true)
+    private val incomingPipeline = Pipeline<ApiMessage>("incoming")
+    private val outgoingPipeline = Pipeline<ResponseMessage>("outgoing", reversed = true)
 
     internal val userid = "sibyl.${UUID.randomUUID().toString().substringBefore('-')}"
 

@@ -7,6 +7,7 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":polling-client"))
     implementation(project(":module:logging"))
+    implementation(project(":module:roleplay"))
 
     implementation("io.github.microutils:kotlin-logging:_")
     implementation("ch.qos.logback:logback-classic:_")
