@@ -82,10 +82,27 @@ subprojects {
     plugins.withId("maven-publish") {
         val artifactId = project.path.drop(1).replace(':', '-') // TODO: try . separator again
         val publicationName = "sibyl"
+
+        val sourcesJar by tasks.creating(Jar::class) {
+            dependsOn(JavaPlugin.CLASSES_TASK_NAME)
+            archiveClassifier.set("sources")
+            val sourceSets = project.extensions.getByName("sourceSets") as SourceSetContainer
+            from(sourceSets["main"].allSource)
+        }
+
+        val javadocJar by tasks.creating(Jar::class) {
+            dependsOn(JavaPlugin.JAVADOC_TASK_NAME)
+            archiveClassifier.set("javadoc")
+            from(tasks["javadoc"])
+        }
+
+
         configure<PublishingExtension> {
             publications {
                 create<MavenPublication>(publicationName) {
                     from(components["kotlin"])
+                    artifact(sourcesJar)
+                    artifact(javadocJar)
                     this.artifactId = artifactId
                 }
             }
