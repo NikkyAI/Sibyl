@@ -46,6 +46,8 @@ version = if(isSnapshot && describeTag.startsWith("v")) {
     patch++
     val nextVersion = "$major.$minor.$patch"
     "$nextVersion-SNAPSHOT" // +$describeAll"
+
+    // TODO: publish snapshots somewhere
 } else {
     describeTag.substringAfter('v')
 }
