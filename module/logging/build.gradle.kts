@@ -1,10 +1,8 @@
 plugins {
     kotlin("jvm")
+    `maven-publish`
 }
 
 dependencies {
     implementation(project(":core"))
-
-    implementation("io.github.microutils:kotlin-logging:_")
-    implementation("ch.qos.logback:logback-classic:_")
 }

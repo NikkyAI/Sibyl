@@ -27,7 +27,7 @@ class CoreModule(private val messageProcessor: MessageProcessor) : SibylModule("
 
     override fun MessageProcessor.setup() {
         registerIncomingInterceptor(Stage.FILTER, ::filterIncoming)
-        registerOutgoingInterceptor(Stage.PRE_FILTER, ::fixOutgoing)
+        registerOutgoingInterceptor(Stage.PRE_FILTER, ::fixResponses)
         registerIncomingInterceptor(Stage.COMMANDS, ::processCommands)
     }
 
@@ -64,11 +64,11 @@ class CoreModule(private val messageProcessor: MessageProcessor) : SibylModule("
         return message
     }
 
-    suspend fun fixOutgoing(response: ResponseMessage, stage: Stage): ResponseMessage? {
+    suspend fun fixResponses(response: ResponseMessage, stage: Stage): ResponseMessage? {
         return response.copy(
             message=response.message.run {
                 copy(
-                    username = username.takeIf { it.isNotBlank() } ?: "Sibyl",
+                    username = username.takeIf { it.isNotBlank() } ?: messageProcessor.botname,
                     userid = messageProcessor.userid,
                     channel = "api"
                 )

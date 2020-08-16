@@ -26,7 +26,7 @@ import kotlinx.serialization.builtins.ListSerializer
 object PollingClient {
     private val logger = KotlinLogging.logger {}
     @OptIn(ExperimentalCoroutinesApi::class)
-    suspend fun connect(
+    suspend fun connectPolling(
         client: HttpClient,
         host: String,
         port: Int,
@@ -34,14 +34,15 @@ object PollingClient {
     ): Pair<SendChannel<ApiMessage>, Flow<ApiMessage>> = withContext(Dispatchers.IO + CoroutineName("polling-client")) {
         val sendMessages: Channel<ApiMessage> = Channel(capacity = Channel.CONFLATED)
 
-        val initialMessages = withTimeoutOrNull(5000) {
+        suspend fun pollMessages(timeout: Long = 5000): List<ApiMessage>? = withTimeoutOrNull(timeout) {
             val json = client.get<String>(host = host, path = "/api/messages", port = port) {
                 if (token != null) {
                     header("Authorization", "Bearer $token")
                 }
             }
             jsonSerializer.decodeFromString(ListSerializer(ApiMessage.serializer()), json)
-        } ?: error("cannot connect")
+        }
+        val initialMessages = pollMessages() ?: error("cannot connect")
 
         val receiveFlow = channelFlow<ApiMessage> {
             initialMessages.forEach {
@@ -49,14 +50,7 @@ object PollingClient {
                 channel.send(it)
             }
             while (!sendMessages.isClosedForSend) {
-                val messages = withTimeoutOrNull(5000) {
-                    val json = client.get<String>(host = host, path = "/api/messages", port = port) {
-                        if (token != null) {
-                            header("Authorization", "Bearer $token")
-                        }
-                    }
-                    jsonSerializer.decodeFromString(ListSerializer(ApiMessage.serializer()), json)
-                }
+                val messages = pollMessages()
                 messages?.forEach {
                     logger.info { "received $it" }
                     channel.send(it)

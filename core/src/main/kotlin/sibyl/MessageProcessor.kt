@@ -7,7 +7,9 @@ import sibyl.api.ApiMessage
 import sibyl.core.CoreModule
 import java.util.*
 
-class MessageProcessor {
+class MessageProcessor(
+    val botname: String = "Sibyl"
+) {
     companion object {
         private val logger = KotlinLogging.logger {}
     }
@@ -21,7 +23,7 @@ class MessageProcessor {
     private val incomingPipeline = Pipeline<ApiMessage>("incoming")
     private val outgoingPipeline = Pipeline<ResponseMessage>("outgoing", reversed = true)
 
-    internal val userid = "sibyl.${UUID.randomUUID().toString().substringBefore('-')}"
+    internal val userid = "${botname.toLowerCase()}.${UUID.randomUUID().toString().substringBefore('-')}"
 
     init {
         addModule(CoreModule(this))

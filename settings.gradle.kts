@@ -11,8 +11,16 @@ bootstrapRefreshVersionsAndDependencies(
 )
 
 rootProject.name = "Sibyl"
+
+fun includeAndRename(path: String) {
+    include(path)
+    project(path).name = path.drop(1).replace(':', '-')
+}
+
 include(":core")
-include(":polling-client")
+include(":client:polling")
+include(":client:websocket")
 include(":module:logging")
 include(":module:roleplay")
 include(":sample")
+

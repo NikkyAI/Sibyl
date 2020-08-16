@@ -18,22 +18,22 @@ val jsonSerializerCompact = Json {
     prettyPrint = false
     encodeDefaults = false
 }
+val messageProcessor = MessageProcessor().apply {
+    addModule(LoggingModule())
+    addModule(RoleplayModule())
+    addModule(TestModule())
+}
 
 private val logger = KotlinLogging.logger {}
 fun main(args: Array<String>) {
+    System.setProperty(DEBUG_PROPERTY_NAME, DEBUG_PROPERTY_VALUE_ON)
     val client = HttpClient(OkHttp) {
 //        install(WebSockets)
     }
 
-    val messageProcessor = MessageProcessor().apply {
-        addModule(LoggingModule())
-        addModule(RoleplayModule())
-        addModule(TestModule())
-    }
-
     runBlocking {
         // TODO: drop all history on first connect
-        val (send, receive) = PollingClient.connect(client, "localhost", 4242/*, token = "mytoken"*/)
+        val (send, receive) = PollingClient.connectPolling(client, "localhost", 4242/*, token = "mytoken"*/)
 
         logger.info { "client started" }
         messageProcessor.start(send = send, receive = receive)

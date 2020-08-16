@@ -1,15 +1,16 @@
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
+    `maven-publish`
 }
 
 dependencies {
-    implementation(kotlin("stdlib", "_"))
+    api(kotlin("stdlib", "_"))
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:_")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")
+    api("org.jetbrains.kotlinx:kotlinx-serialization-core:_")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")
 
-    implementation("io.github.microutils:kotlin-logging:_")
+    api("io.github.microutils:kotlin-logging:_")
     implementation("ch.qos.logback:logback-classic:_")
 
     api("joda-time:joda-time:_")
