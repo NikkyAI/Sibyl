@@ -8,12 +8,13 @@ plugins {
 val bintrayOrg: String? = System.getenv("BINTRAY_USER")
 val bintrayApiKey: String? = System.getenv("BINTRAY_API_KEY")
 val bintrayRepository = "github"
-val bintrayPackage = "sibyl"
+var bintrayPackage = "sibyl"
 val vcs = "https://github.com/NikkyAI/Sibyl"
-val issues = "https://github.com/NikkyAI/Sibyl/issues"
+val issues = "$vcs/issues"
 //val tags = setOf()
 
 group = "moe.nikky.sibyl"
+description = "modular chatbot framework for matterlink"
 
 fun captureExec(configure: ExecSpec.()->Unit): String? {
     val stdout = java.io.ByteArrayOutputStream()
@@ -29,30 +30,40 @@ fun captureExec(configure: ExecSpec.()->Unit): String? {
     return stdout.toString()
 }
 
-// tag when current ref is on a tag, otherwise commit hash
-val describeAll = captureExec {
+// tag or commit hash
+val describeTagsAlways = captureExec {
     commandLine("git", "describe", "--tags", "--always")
 }?.trim()?.substringAfterLast('-')
 
 // current or last tag
-val describeTag = captureExec {
+val describeAbbrevTags = captureExec {
     commandLine("git", "describe", "--abbrev=0", "--tags")
 }?.trim() ?: "v0.0.0"
 
-logger.lifecycle( "all: '$describeAll'" )
-logger.lifecycle( "tag: '$describeTag'" )
+val describeTags = captureExec {
+    commandLine("git", "describe", "--tags")
+}?.trim() ?: "v0.0.0"
 
-val isSnapshot = describeAll != describeTag
-version = if(isSnapshot && describeTag.startsWith("v")) {
-    val lastVersion = describeTag.substringAfter("v")
+val describeAbbrevAlwaysTags = captureExec {
+    commandLine("git", "describe", "--abbrev=0", "--always", "--tags")
+}?.trim() ?: "v0.0.0"
+
+logger.lifecycle( "describeTagsAlways: '$describeTagsAlways'" )
+logger.lifecycle( "tag: '$describeAbbrevTags'" )
+logger.lifecycle( "tag2: '$describeTags'" )
+logger.lifecycle( "commit-hash: '$describeAbbrevAlwaysTags'" )
+
+val isSnapshot = describeTagsAlways != describeAbbrevTags
+version = if(isSnapshot && describeAbbrevTags.startsWith("v")) {
+    val lastVersion = describeAbbrevTags.substringAfter("v")
     var (major, minor, patch) = lastVersion.split('.').map { it.toInt() }
     patch++
     val nextVersion = "$major.$minor.$patch"
-    "$nextVersion-dev+$describeAll"
+    "$nextVersion-dev+$describeTagsAlways"
 
-    // TODO: use sibyl-dev package
+    bintrayPackage = "sibyl-dev"
 } else {
-    describeTag.substringAfter('v')
+    describeAbbrevTags.substringAfter('v')
 }
 
 logger.lifecycle("version is $version")
@@ -68,7 +79,7 @@ subprojects {
     version = rootProject.version
 
     plugins.withId("maven-publish") {
-        val artifactId = project.path.drop(1).replace(':', '-')
+        val artifactId = project.path.drop(1).replace(':', '-') // TODO: try . separator again
         val publicationName = "sibyl"
         configure<PublishingExtension> {
             publications {
@@ -86,7 +97,7 @@ subprojects {
         configure<com.jfrog.bintray.gradle.BintrayExtension> {
             user = bintrayOrg
             key = bintrayApiKey
-            publish = false
+            publish = true
             override = false
 //            dryRun = true // TODO: disable on github actions
             setPublications(publicationName)
@@ -95,9 +106,15 @@ subprojects {
                 name = bintrayPackage
                 userOrg = bintrayOrg
                 version = VersionConfig().apply {
-                    vcsTag = describeAll
+                    // do not put commit hashes in vcs tag
+//                    if(!isSnapshot) {
+//                        vcsTag = describeAbbrevAlwaysTags
+//                    }
+                    vcsTag = describeAbbrevAlwaysTags
                     name = project.version.toString()
+                    githubReleaseNotesFile = "RELEASE_NOTES.md"
                 }
+                description = rootProject.description
 //                websiteUrl = "https://...."
                 vcsUrl = vcs
                 setLabels("kotlin", "matterbridge", "chatbot")
@@ -105,18 +122,6 @@ subprojects {
                 issueTrackerUrl = issues
             })
         }
-//        configure<PublishingExtension> {
-//            repositories {
-//                val pkg = project.path.drop(1).replace(':', '-')
-//                maven("https://api.bintray.com/maven/$bintrayOrg/$bintrayRepository/sibyl/;publish=0;override=1") {
-//                    name = "bintray"
-//                    credentials {
-//                        username = bintrayOrg
-//                        password = bintrayApiKey
-//                    }
-//                }
-//            }
-//        }
         tasks.withType<PublishToMavenRepository>().all {
             doFirst {
                 logger.lifecycle("running ${name}")
@@ -153,31 +158,18 @@ dependencyGraphGenerator {
         includeProject = { project ->
             logger.lifecycle("project: $project")
             project.buildFile.exists()
-//            true
         }
     )
 }
 
 tasks {
     withType(com.vanniktech.dependency.graph.generator.DependencyGraphGeneratorTask::class).all {
-//        outputs.upToDateWhen { false }
         doFirst {
             outputDirectory = outputDirectory.resolve(generator.name)
             outputDirectory.deleteRecursively()
             outputDirectory.mkdirs()
-//            outputs.files.forEach {
-//                it.delete()
-//            }
         }
     }
-//    val generateDependencyGraph by existing() {
-//
-//        doFirst {
-//            outputs.cacheIf { false }
-//            outputDirectory.deleteRecursively()
-//            outputDirectory.mkdirs()
-//        }
-//    }
 }
 
 // TODO: add bintray publishing
