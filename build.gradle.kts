@@ -5,7 +5,7 @@ plugins {
 }
 
 val bintrayOrg: String? = System.getenv("BINTRAY_USER")
-val bintrayApiKey: String? = System.getenv("BINTRAY_KEY")
+val bintrayApiKey: String? = System.getenv("BINTRAY_API_KEY")
 val bintrayRepository = "github"
 val bintrayPackage = "sibyl"
 val vcs = "https://github.com/NikkyAI/Sibyl"
@@ -93,6 +93,7 @@ subprojects {
             }
         }
         if (bintrayOrg == null || bintrayApiKey == null) {
+            logger.error("bintray credentials not configured properly")
             return@withId
         }
         configure<PublishingExtension> {
