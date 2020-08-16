@@ -2,7 +2,7 @@
 
 ### 0.0.2
 
-- placeholder
+- snapshots are now published to https://bintray.com/nikkyai/github/sibyl-dev
 
 ### 0.0.1
 

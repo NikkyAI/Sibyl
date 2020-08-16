@@ -9,12 +9,11 @@ val bintrayOrg: String? = System.getenv("BINTRAY_USER")
 val bintrayApiKey: String? = System.getenv("BINTRAY_API_KEY")
 val bintrayRepository = "github"
 var bintrayPackage = "sibyl"
-val vcs = "https://github.com/NikkyAI/Sibyl"
-val issues = "$vcs/issues"
-//val tags = setOf()
+//val vcs = "https://github.com/NikkyAI/Sibyl"
+//val issues = "$vcs/issues"
 
 group = "moe.nikky.sibyl"
-description = "modular chatbot framework for matterlink"
+description = "modular chatbot framework for matterbridge"
 
 fun captureExec(configure: ExecSpec.()->Unit): String? {
     val stdout = java.io.ByteArrayOutputStream()
@@ -44,14 +43,14 @@ val describeTags = captureExec {
     commandLine("git", "describe", "--tags")
 }?.trim() ?: "v0.0.0"
 
-val describeAbbrevAlwaysTags = captureExec {
-    commandLine("git", "describe", "--abbrev=0", "--always", "--tags")
+val describeAbbrevAlways = captureExec {
+    commandLine("git", "describe", "--abbrev=0", "--always")
 }?.trim() ?: "v0.0.0"
 
 logger.lifecycle( "describeTagsAlways: '$describeTagsAlways'" )
 logger.lifecycle( "tag: '$describeAbbrevTags'" )
 logger.lifecycle( "tag2: '$describeTags'" )
-logger.lifecycle( "commit-hash: '$describeAbbrevAlwaysTags'" )
+logger.lifecycle( "commit-hash: '$describeAbbrevAlways'" )
 
 val isSnapshot = describeTagsAlways != describeAbbrevTags
 val versionStr: String = if(isSnapshot && describeAbbrevTags.startsWith("v")) {
@@ -110,19 +109,19 @@ subprojects {
                 userOrg = bintrayOrg
                 version = VersionConfig().apply {
                     // do not put commit hashes in vcs tag
-//                    if(!isSnapshot) {
-//                        vcsTag = describeAbbrevAlwaysTags
-//                    }
-                    vcsTag = describeAbbrevAlwaysTags
+                    if(!isSnapshot) {
+                        vcsTag = describeTagsAlways
+                    }
+//                    vcsTag = describeAbbrevAlwaysTags
                     name = versionStr
                     githubReleaseNotesFile = "RELEASE_NOTES.md"
                 }
-                description = rootProject.description
+//                description = rootProject.description
 //                websiteUrl = "https://...."
-                vcsUrl = vcs
-                setLabels("kotlin", "matterbridge", "chatbot")
-                setLicenses("MIT")
-                issueTrackerUrl = issues
+//                vcsUrl = vcs
+//                setLabels("kotlin", "matterbridge", "chatbot")
+//                setLicenses("MIT")
+//                issueTrackerUrl = issues
             })
         }
     }
