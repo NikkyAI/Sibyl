@@ -10,6 +10,8 @@ val bintrayApiKey: String? = System.getenv("BINTRAY_API_KEY")
 val bintrayRepository = "github"
 val bintrayPackage = "sibyl"
 val vcs = "https://github.com/NikkyAI/Sibyl"
+val issues = "https://github.com/NikkyAI/Sibyl/issues"
+//val tags = setOf()
 
 group = "moe.nikky.sibyl"
 
@@ -75,32 +77,6 @@ subprojects {
                     this.artifactId = artifactId
                 }
             }
-
-//            publications.withType<MavenPublication> {
-//                pom {
-//                    name.set(project.name)
-//                    description.set(project.description)
-//                    url.set(vcs)
-//                    licenses {
-//                        license {
-//                            name.set("MIT")
-//                            url.set("https://mit-license.org/")
-//                            distribution.set("repo")
-//                        }
-//                    }
-//                    developers {
-//                        developer {
-//                            id.set("nikkyai")
-//                            name.set("NikkyAi")
-//                        }
-//                    }
-//                    scm {
-//                        connection.set("$vcs.git")
-//                        developerConnection.set("$vcs.git")
-//                        url.set(vcs)
-//                    }
-//                }
-//            }
         }
         if (bintrayOrg == null || bintrayApiKey == null) {
             logger.error("bintray credentials not configured properly")
@@ -112,15 +88,21 @@ subprojects {
             key = bintrayApiKey
             publish = false
             override = false
+//            dryRun = true // TODO: disable on github actions
             setPublications(publicationName)
             pkg(delegateClosureOf<com.jfrog.bintray.gradle.BintrayExtension.PackageConfig> {
                 repo =  bintrayRepository
                 name = bintrayPackage
                 userOrg = bintrayOrg
+                version = VersionConfig().apply {
+                    vcsTag = describeAll
+                    name = project.version.toString()
+                }
 //                websiteUrl = "https://...."
                 vcsUrl = vcs
                 setLabels("kotlin", "matterbridge", "chatbot")
                 setLicenses("MIT")
+                issueTrackerUrl = issues
             })
         }
 //        configure<PublishingExtension> {
