@@ -54,17 +54,19 @@ logger.lifecycle( "tag2: '$describeTags'" )
 logger.lifecycle( "commit-hash: '$describeAbbrevAlwaysTags'" )
 
 val isSnapshot = describeTagsAlways != describeAbbrevTags
-version = if(isSnapshot && describeAbbrevTags.startsWith("v")) {
+val versionStr: String = if(isSnapshot && describeAbbrevTags.startsWith("v")) {
     val lastVersion = describeAbbrevTags.substringAfter("v")
     var (major, minor, patch) = lastVersion.split('.').map { it.toInt() }
     patch++
     val nextVersion = "$major.$minor.$patch"
-    "$nextVersion-dev+$describeTagsAlways"
-
     bintrayPackage = "sibyl-dev"
+
+    "$nextVersion-dev+$describeTagsAlways"
 } else {
     describeAbbrevTags.substringAfter('v')
 }
+
+project.version = versionStr
 
 logger.lifecycle("version is $version")
 
@@ -75,8 +77,8 @@ subprojects {
         maven(url = "https://kotlin.bintray.com/ktor")
     }
 
-    group = rootProject.group
-    version = rootProject.version
+    project.group = rootProject.group
+    project.version = versionStr
 
     plugins.withId("maven-publish") {
         val artifactId = project.path.drop(1).replace(':', '-') // TODO: try . separator again
@@ -99,6 +101,7 @@ subprojects {
             key = bintrayApiKey
             publish = true
             override = false
+            dryRun = !properties.containsKey("nodryrun")
 //            dryRun = true // TODO: disable on github actions
             setPublications(publicationName)
             pkg(delegateClosureOf<com.jfrog.bintray.gradle.BintrayExtension.PackageConfig> {
@@ -111,7 +114,7 @@ subprojects {
 //                        vcsTag = describeAbbrevAlwaysTags
 //                    }
                     vcsTag = describeAbbrevAlwaysTags
-                    name = project.version.toString()
+                    name = versionStr
                     githubReleaseNotesFile = "RELEASE_NOTES.md"
                 }
                 description = rootProject.description
@@ -121,17 +124,6 @@ subprojects {
                 setLicenses("MIT")
                 issueTrackerUrl = issues
             })
-        }
-        tasks.withType<PublishToMavenRepository>().all {
-            doFirst {
-                logger.lifecycle("running ${name}")
-                logger.lifecycle("publishing ${artifactId}")
-            }
-        }
-        val publishTasks = tasks.withType<PublishToMavenRepository>()
-        tasks.register("smartPublish") {
-            group = "publishing"
-            dependsOn(publishTasks)
         }
     }
 }
