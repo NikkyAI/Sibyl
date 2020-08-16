@@ -20,7 +20,7 @@ fun captureExec(configure: ExecSpec.()->Unit): String? {
             standardOutput = stdout
         }
     }catch (e: org.gradle.process.internal.ExecException) {
-        e.printStackTrace()
+        logger.error(e.message)
         return null
     }
     return stdout.toString()
@@ -34,16 +34,20 @@ val describeAll = captureExec {
 // current or last tag
 val describeTag = captureExec {
     commandLine("git", "describe", "--abbrev=0", "--tags")
-}?.trim() ?: "0.0.1"
+}?.trim() ?: "v0.0.0"
 
 logger.lifecycle( "all: '$describeAll'" )
 logger.lifecycle( "tag: '$describeTag'" )
 
 val isSnapshot = describeAll != describeTag
-version = if(isSnapshot) {
-    "$describeTag-SNAPSHOT+$describeAll"
+version = if(isSnapshot && describeTag.startsWith("v")) {
+    val lastVersion = describeTag.substringAfter("v")
+    var (major, minor, patch) = lastVersion.split('.').map { it.toInt() }
+    patch++
+    val nextVersion = "$major.$minor.$patch"
+    "$nextVersion-SNAPSHOT" // +$describeAll"
 } else {
-    describeTag
+    describeTag.substringAfter('v')
 }
 
 
