@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm") apply false
     kotlin("plugin.serialization") apply false
     id("com.vanniktech.dependency.graph.generator") version "0.5.0"
+    id("com.jfrog.bintray") version "1.8.5" apply false
 }
 
 val bintrayOrg: String? = System.getenv("BINTRAY_USER")
@@ -45,13 +46,14 @@ version = if(isSnapshot && describeTag.startsWith("v")) {
     var (major, minor, patch) = lastVersion.split('.').map { it.toInt() }
     patch++
     val nextVersion = "$major.$minor.$patch"
-    "$nextVersion-SNAPSHOT" // +$describeAll"
+    "$nextVersion-dev+$describeAll"
 
-    // TODO: publish snapshots somewhere
+    // TODO: use sibyl-dev package
 } else {
     describeTag.substringAfter('v')
 }
 
+logger.lifecycle("version is $version")
 
 subprojects {
     repositories {
@@ -64,84 +66,86 @@ subprojects {
     version = rootProject.version
 
     plugins.withId("maven-publish") {
+        val artifactId = project.path.drop(1).replace(':', '-')
+        val publicationName = "sibyl"
         configure<PublishingExtension> {
             publications {
-                create<MavenPublication>("maven") {
+                create<MavenPublication>(publicationName) {
                     from(components["kotlin"])
-                    artifactId = project.path.drop(1).replace(':', '-')
+                    this.artifactId = artifactId
                 }
             }
 
-            publications.withType<MavenPublication> {
-                pom {
-                    name.set(project.name)
-                    description.set(project.description)
-                    url.set(vcs)
-                    licenses {
-                        license {
-                            name.set("The Apache Software License, Version 2.0")
-                            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                            distribution.set("repo")
-                        }
-                    }
-                    developers {
-                        developer {
-                            id.set("nikkyai")
-                            name.set("NikkyAi")
-                        }
-                    }
-                    scm {
-                        connection.set("$vcs.git")
-                        developerConnection.set("$vcs.git")
-                        url.set(vcs)
-                    }
-                }
-            }
+//            publications.withType<MavenPublication> {
+//                pom {
+//                    name.set(project.name)
+//                    description.set(project.description)
+//                    url.set(vcs)
+//                    licenses {
+//                        license {
+//                            name.set("MIT")
+//                            url.set("https://mit-license.org/")
+//                            distribution.set("repo")
+//                        }
+//                    }
+//                    developers {
+//                        developer {
+//                            id.set("nikkyai")
+//                            name.set("NikkyAi")
+//                        }
+//                    }
+//                    scm {
+//                        connection.set("$vcs.git")
+//                        developerConnection.set("$vcs.git")
+//                        url.set(vcs)
+//                    }
+//                }
+//            }
         }
         if (bintrayOrg == null || bintrayApiKey == null) {
             logger.error("bintray credentials not configured properly")
             return@withId
         }
-        configure<PublishingExtension> {
-//            publications {
-//                create<MavenPublication>("maven") {
-//                    from(components["kotlin"])
-//                    artifactId = project.path.drop(1).replace(':', '.')
+        project.apply(plugin = "com.jfrog.bintray")
+        configure<com.jfrog.bintray.gradle.BintrayExtension> {
+            user = bintrayOrg
+            key = bintrayApiKey
+            publish = false
+            override = false
+            setPublications(publicationName)
+            pkg(delegateClosureOf<com.jfrog.bintray.gradle.BintrayExtension.PackageConfig> {
+                repo =  bintrayRepository
+                name = bintrayPackage
+                userOrg = bintrayOrg
+//                websiteUrl = "https://...."
+                vcsUrl = vcs
+                setLabels("kotlin", "matterbridge", "chatbot")
+                setLicenses("MIT")
+            })
+        }
+//        configure<PublishingExtension> {
+//            repositories {
+//                val pkg = project.path.drop(1).replace(':', '-')
+//                maven("https://api.bintray.com/maven/$bintrayOrg/$bintrayRepository/sibyl/;publish=0;override=1") {
+//                    name = "bintray"
+//                    credentials {
+//                        username = bintrayOrg
+//                        password = bintrayApiKey
+//                    }
 //                }
 //            }
-
-//            val vcs: String by project
-//            val bintrayOrg: String by project
-//            val bintrayRepository: String by project
-
-            repositories {
-                maven("https://api.bintray.com/maven/$bintrayOrg/$bintrayRepository/$bintrayPackage/;publish=0;override=0") {
-                    name = "bintray"
-                    credentials {
-                        username = bintrayOrg
-                        password = bintrayApiKey
-                    }
-                }
+//        }
+        tasks.withType<PublishToMavenRepository>().all {
+            doFirst {
+                logger.lifecycle("running ${name}")
+                logger.lifecycle("publishing ${artifactId}")
             }
         }
-
-//        val publishTasks = tasks.withType<PublishToMavenRepository>()
-//            .matching {
-//                when {
-//                    org.jetbrains.kotlin.konan.target.HostManager.hostIsMingw -> it.name.startsWith("publishMingw")
-//                    org.jetbrains.kotlin.konan.target.HostManager.hostIsMac -> it.name.startsWith("publishMacos") || it.name.startsWith("publishIos")
-//                    org.jetbrains.kotlin.konan.target.HostManager.hostIsLinux -> it.name.startsWith("publishLinux") ||
-//                            it.name.startsWith("publishJs") ||
-//                            it.name.startsWith("publishJvm") ||
-//                            it.name.startsWith("publishMetadata") ||
-//                            it.name.startsWith("publishKotlinMultiplatform")
-//                    else -> TODO("Unknown host")
-//                }
-//            }
-//        tasks.register("smartPublish") {
-//            group = "publishing"
-//            dependsOn(publishTasks)
-//        }
+        val publishTasks = tasks.withType<PublishToMavenRepository>()
+        tasks.register("smartPublish") {
+            group = "publishing"
+            dependsOn(publishTasks)
+        }
     }
 }
 

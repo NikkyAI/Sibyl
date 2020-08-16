@@ -21,8 +21,8 @@ jobs:
       - name: 'Publish to BinTray'
         uses: eskatos/gradle-command-action@v1
         with:
-          arguments: 'publishAllPublicationsToBintrayRepository --stacktrace'
-        if: startsWith(github.ref, 'refs/tags/')
+          arguments: 'bintrayUpload --stacktrace'
+#        if: startsWith(github.ref, 'refs/tags/')
         env:
           BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
           BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
