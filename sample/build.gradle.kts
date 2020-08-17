@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":module:roleplay"))
     implementation(project(":module:pastee"))
     implementation(project(":module:pastebin"))
+    implementation(project(":module:hastebin"))
 
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:_")
 //    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")

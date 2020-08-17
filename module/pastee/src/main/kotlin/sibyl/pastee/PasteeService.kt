@@ -12,7 +12,7 @@ import sibyl.pastee.syntax.SyntaxesResponse
 object PasteeService {
     private val logger = KotlinLogging.logger {}
     private const val DEFAULT_KEY = "uKJoyicVJFnmpnrIZMklOURWxrCKXYaiBWOzPmvon"
-    val jsonSerializer = Json {
+    private val jsonSerializer = Json {
         prettyPrint = false
         encodeDefaults = false
     }

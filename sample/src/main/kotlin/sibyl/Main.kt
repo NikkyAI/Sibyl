@@ -10,6 +10,7 @@ import mu.KotlinLogging
 import sibyl.client.PollingClient
 import kotlinx.serialization.json.Json
 import sibyl.core.CoreModule
+import sibyl.haste.HasteModule
 import sibyl.pastebin.PastebinModule
 import sibyl.pastee.PasteeModule
 import java.io.File
@@ -27,7 +28,7 @@ private val client = HttpClient(OkHttp) {
 }
 val messageProcessor = MessageProcessor().apply {
     addModule(LoggingModule())
-    addModule(PasteeModule(client))
+    addModule(HasteModule(client))
     addModule(RoleplayModule())
     addModule(TestModule())
 }

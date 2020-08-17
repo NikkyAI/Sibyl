@@ -24,5 +24,6 @@ include(":module:logging")
 include(":module:roleplay")
 include(":module:pastee")
 include(":module:pastebin")
+include(":module:hastebin")
 include(":sample")
 

@@ -2,7 +2,7 @@
 
 ### 0.0.3
 
-- add pastebin and paste.ee modules
+- add pastebin, paste.ee and hastebin modules
 
 ### 0.0.2
 
