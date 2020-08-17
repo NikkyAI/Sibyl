@@ -1,11 +1,16 @@
 package sibyl
 
 import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.onEach
 import mu.KotlinLogging
 import sibyl.api.ApiMessage
 import sibyl.core.CoreModule
 import java.util.*
+import kotlin.reflect.KClass
+import kotlin.reflect.cast
 
 class MessageProcessor(
     val botname: String = "Sibyl"
@@ -26,7 +31,7 @@ class MessageProcessor(
     internal val userid = "${botname.toLowerCase()}.${UUID.randomUUID().toString().substringBefore('-')}"
 
     init {
-        addModule(CoreModule(this))
+        addModule(CoreModule())
     }
 
     @OptIn(ExperimentalStdlibApi::class)
@@ -46,9 +51,10 @@ class MessageProcessor(
             messageProcessor = this,
             sendResponse = { response: ResponseMessage, stage: Stage? ->
                 // TODO: pass in output buffer ?
-                val transformedResponse = if(stage != null) outgoingPipeline.process(response, stage) else  outgoingPipeline.process(response)
-                if(transformedResponse != null) {
-                    logger.info {"response from ${transformedResponse.from}"}
+                val transformedResponse =
+                    if (stage != null) outgoingPipeline.process(response, stage) else outgoingPipeline.process(response)
+                if (transformedResponse != null) {
+                    logger.info { "response from ${transformedResponse.from}" }
                     sendChannel.send(transformedResponse.message)
                 }
             }
@@ -81,8 +87,21 @@ class MessageProcessor(
 
     suspend fun process(message: ApiMessage) {
         val processedMessage = incomingPipeline.process(message)
-        if(processedMessage != null) {
+        if (processedMessage != null) {
             logger.info { "message was not consumed" }
+        }
+    }
+
+    fun <T : SibylModule> hasModule(clazz: KClass<T>): Boolean {
+        return modules.any { module ->
+            clazz.isInstance(module)
+        }
+    }
+    fun <T : SibylModule> getModule(clazz: KClass<T>): T? {
+        return modules.find { module ->
+            clazz.isInstance(module)
+        }?.let { module ->
+            clazz.cast(module)
         }
     }
 }

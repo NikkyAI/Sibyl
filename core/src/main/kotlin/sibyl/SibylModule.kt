@@ -10,6 +10,8 @@ abstract class SibylModule(
 ) {
     open val commands: List<SibylCommand> = listOf()
 
+    protected lateinit var messageProcessor: MessageProcessor
+        private set
     private lateinit var sendResponse: suspend (ResponseMessage, Stage?) -> Unit
 
     suspend fun sendMessage(message: ApiMessage, stage: Stage? = null, fromCommand: SibylCommand? = null) {
@@ -25,6 +27,7 @@ abstract class SibylModule(
 
     fun init(messageProcessor: MessageProcessor, sendResponse: suspend (ResponseMessage, Stage?) -> Unit) {
         this.sendResponse = sendResponse
+        this.messageProcessor = messageProcessor
         with(messageProcessor) {
             setup()
         }

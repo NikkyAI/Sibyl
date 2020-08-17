@@ -22,5 +22,7 @@ include(":client:polling")
 include(":client:websocket")
 include(":module:logging")
 include(":module:roleplay")
+include(":module:pastee")
+include(":module:pastebin")
 include(":sample")
 

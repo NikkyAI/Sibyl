@@ -16,5 +16,6 @@ dependencies {
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:_")
 //    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")
 
+    api("io.ktor:ktor-client-core:_")
     api("io.ktor:ktor-client-okhttp:_")
 }

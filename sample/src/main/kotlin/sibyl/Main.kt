@@ -9,6 +9,10 @@ import sibyl.test.TestModule
 import mu.KotlinLogging
 import sibyl.client.PollingClient
 import kotlinx.serialization.json.Json
+import sibyl.core.CoreModule
+import sibyl.pastebin.PastebinModule
+import sibyl.pastee.PasteeModule
+import java.io.File
 
 val jsonSerializer = Json {
     prettyPrint = true
@@ -18,8 +22,12 @@ val jsonSerializerCompact = Json {
     prettyPrint = false
     encodeDefaults = false
 }
+private val client = HttpClient(OkHttp) {
+//        install(WebSockets)
+}
 val messageProcessor = MessageProcessor().apply {
     addModule(LoggingModule())
+    addModule(PasteeModule(client))
     addModule(RoleplayModule())
     addModule(TestModule())
 }
@@ -27,13 +35,26 @@ val messageProcessor = MessageProcessor().apply {
 private val logger = KotlinLogging.logger {}
 fun main(args: Array<String>) {
     System.setProperty(DEBUG_PROPERTY_NAME, DEBUG_PROPERTY_VALUE_ON)
-    val client = HttpClient(OkHttp) {
-//        install(WebSockets)
-    }
+
+    val connectData = File("connect.json").takeIf { it.exists() }?.readText()?.let {
+        jsonSerializerPretty.decodeFromString(ConnectData.serializer(), it)
+    } ?: ConnectData(
+        controlGateway = "matterbridgetest",
+        host = "localhost",
+        port = 4242,
+        token = null
+    )
 
     runBlocking {
         // TODO: drop all history on first connect
-        val (send, receive) = PollingClient.connectPolling(client, "localhost", 4242/*, token = "mytoken"*/)
+        val (send, receive) = PollingClient.connectPolling(
+            client,
+            host = connectData.host,
+            port = connectData.port,
+            token = connectData.token
+        )
+
+        messageProcessor.getModule(CoreModule::class)?.controlGateway = connectData.controlGateway
 
         logger.info { "client started" }
         messageProcessor.start(send = send, receive = receive)

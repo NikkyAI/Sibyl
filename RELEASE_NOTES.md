@@ -1,5 +1,9 @@
 ## Release Notes
 
+### 0.0.3
+
+- add pastebin and paste.ee modules
+
 ### 0.0.2
 
 - snapshots are now published to https://bintray.com/nikkyai/github/sibyl-dev

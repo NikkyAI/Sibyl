@@ -12,7 +12,8 @@ import sibyl.commands.BufferConsole
 import sibyl.commands.SibylCommand
 import sibyl.commands.runCommand
 
-class CoreModule(private val messageProcessor: MessageProcessor) : SibylModule("core", "core framework functionality") {
+class CoreModule : SibylModule("core", "core framework functionality") {
+    lateinit var controlGateway: String // load this from messageProcessor ?
     companion object {
         private val logger = KotlinLogging.logger {}
 
@@ -20,10 +21,12 @@ class CoreModule(private val messageProcessor: MessageProcessor) : SibylModule("
         val FILTER = Stage("FILTER", 0)
     }
 
-    override val commands: List<SibylCommand> = listOf(
-        CommandsCommand(messageProcessor),
-        ModulesCommand(messageProcessor)
-    )
+    override val commands: List<SibylCommand> by lazy {
+        listOf(
+            CommandsCommand(messageProcessor),
+            ModulesCommand(messageProcessor)
+        )
+    }
 
     override fun MessageProcessor.setup() {
         registerIncomingInterceptor(Stage.FILTER, ::filterIncoming)
@@ -37,7 +40,7 @@ class CoreModule(private val messageProcessor: MessageProcessor) : SibylModule("
                 logger.info { "sending shutdown message" }
                 sendMessage(
                     ApiMessage(
-                        gateway = "matterbridgetest", // TODO: make control gateway configurable
+                        gateway = controlGateway, // TODO: make control gateway configurable
                         text = "shutting down"
                     ),
                     stage = null
@@ -48,7 +51,7 @@ class CoreModule(private val messageProcessor: MessageProcessor) : SibylModule("
         runBlocking {
             sendMessage(
                 ApiMessage(
-                    gateway = "matterbridgetest", // TODO: make control gateway configurable
+                    gateway = controlGateway, // TODO: make control gateway configurable
                     text = "starting up"
                 ),
                 stage = null
@@ -56,7 +59,7 @@ class CoreModule(private val messageProcessor: MessageProcessor) : SibylModule("
         }
     }
 
-    suspend fun filterIncoming(message: ApiMessage, stage: Stage): ApiMessage? {
+    private suspend fun filterIncoming(message: ApiMessage, stage: Stage): ApiMessage? {
         if (message.userid == messageProcessor.userid) {
             logger.debug { "ignoring loopback message $message" }
             return null
@@ -64,7 +67,7 @@ class CoreModule(private val messageProcessor: MessageProcessor) : SibylModule("
         return message
     }
 
-    suspend fun fixResponses(response: ResponseMessage, stage: Stage): ResponseMessage? {
+    private suspend fun fixResponses(response: ResponseMessage, stage: Stage): ResponseMessage? {
         return response.copy(
             message=response.message.run {
                 copy(

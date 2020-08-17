@@ -1,0 +1,176 @@
+## Paste.ee Module
+
+### Syntaxes
+
+might be outdated
+
+- 1: `text` Text
+- 2: `1c` 1C
+- 3: `abnf` Augmented Backus-Naur Form
+- 4: `accesslog` Access log
+- 5: `actionscript` ActionScript
+- 6: `ada` Ada
+- 7: `apache` Apache
+- 8: `applescript` AppleScript
+- 9: `arduino` Arduino
+- 10: `armasm` ARM Assembly
+- 11: `asciidoc` AsciiDoc
+- 12: `aspectj` AspectJ
+- 13: `autohotkey` AutoHotkey
+- 14: `autoit` AutoIt
+- 15: `avrasm` AVR Assembler
+- 16: `awk` Awk
+- 17: `axapta` Axapta
+- 18: `bash` Bash
+- 19: `basic` Basic
+- 20: `bnf` Backus–Naur Form
+- 21: `brainfuck` Brainfuck
+- 22: `cal` C/AL
+- 23: `capnproto` Cap’n Proto
+- 24: `ceylon` Ceylon
+- 25: `clean` Clean
+- 26: `clojure-repl` Clojure REPL
+- 27: `clojure` Clojure
+- 28: `cmake` CMake
+- 29: `coffeescript` CoffeeScript
+- 30: `coq` Coq
+- 31: `cos` Caché Object Script
+- 32: `cpp` C++
+- 33: `crmsh` crmsh
+- 34: `crystal` Crystal
+- 35: `cs` C#
+- 36: `csp` CSP
+- 37: `css` CSS
+- 38: `d` D
+- 39: `dart` Dart
+- 40: `delphi` Delphi
+- 41: `diff` Diff
+- 42: `django` Django
+- 43: `dns` DNS Zone file
+- 44: `dockerfile` Dockerfile
+- 45: `dos` DOS .bat
+- 46: `dsconfig` dsconfig
+- 47: `dts` Device Tree
+- 48: `dust` Dust
+- 49: `ebnf` Extended Backus-Naur Form
+- 50: `elixir` Elixir
+- 51: `elm` Elm
+- 52: `erb` ERB (Embedded Ruby)
+- 53: `erlang-repl` Erlang REPL
+- 54: `erlang` Erlang
+- 55: `excel` Excel
+- 56: `fix` FIX
+- 57: `flix` Flix
+- 58: `fortran` Fortran
+- 59: `fsharp` F#
+- 60: `gams` GAMS
+- 61: `gauss` GAUSS
+- 62: `gcode` G-code (ISO 6983)
+- 63: `gherkin` Gherkin
+- 64: `glsl` GLSL
+- 65: `go` Go
+- 66: `golo` Golo
+- 67: `gradle` Gradle
+- 68: `groovy` Groovy
+- 69: `haml` Haml
+- 70: `handlebars` Handlebars
+- 71: `haskell` Haskell
+- 72: `haxe` Haxe
+- 73: `hsp` HSP
+- 74: `htmlbars` HTMLBars
+- 75: `http` HTTP
+- 76: `inform7` Inform 7
+- 77: `ini` Ini
+- 78: `irpf90` IRPF90
+- 79: `java` Java
+- 80: `javascript` JavaScript
+- 81: `json` JSON
+- 82: `julia` Julia
+- 83: `kotlin` Kotlin
+- 84: `lasso` Lasso
+- 85: `ldif` LDIF
+- 86: `less` Less
+- 87: `lisp` Lisp
+- 88: `livecodeserver` LiveCode
+- 89: `livescript` LiveScript
+- 90: `lsl` Linden Scripting Language
+- 91: `lua` Lua
+- 92: `makefile` Makefile
+- 93: `markdown` Markdown
+- 94: `mathematica` Mathematica
+- 95: `matlab` Matlab
+- 96: `maxima` Maxima
+- 97: `mel` MEL
+- 98: `mercury` Mercury
+- 99: `mipsasm` MIPS Assembly
+- 100: `mizar` Mizar
+- 101: `mojolicious` Mojolicious
+- 102: `monkey` Monkey
+- 103: `moonscript` MoonScript
+- 104: `nginx` Nginx
+- 105: `nimrod` Nimrod
+- 106: `nix` Nix
+- 107: `nsis` NSIS
+- 108: `objectivec` Objective-C
+- 109: `ocaml` OCaml
+- 110: `openscad` OpenSCAD
+- 111: `oxygene` Oxygene
+- 112: `parser3` Parser3
+- 113: `perl` Perl
+- 114: `pf` pf
+- 115: `php` PHP
+- 116: `pony` Pony
+- 117: `powershell` PowerShell
+- 118: `processing` Processing
+- 119: `profile` Python profile
+- 120: `prolog` Prolog
+- 121: `protobuf` Protocol Buffers
+- 122: `puppet` Puppet
+- 123: `purebasic` PureBASIC
+- 124: `python` Python
+- 125: `q` Q
+- 126: `qml` QML
+- 127: `r` R
+- 128: `rib` RenderMan RIB
+- 129: `roboconf` Roboconf
+- 130: `rsl` RenderMan RSL
+- 131: `ruby` Ruby
+- 132: `ruleslanguage` Oracle Rules Language
+- 133: `rust` Rust
+- 134: `scala` Scala
+- 135: `scheme` Scheme
+- 136: `scilab` Scilab
+- 137: `scss` SCSS
+- 138: `smali` Smali
+- 139: `smalltalk` Smalltalk
+- 140: `sml` SML
+- 141: `sqf` SQF
+- 142: `sql` SQL
+- 143: `stan` Stan
+- 144: `stata` Stata
+- 145: `step21` STEP Part 21
+- 146: `stylus` Stylus
+- 147: `subunit` SubUnit
+- 148: `swift` Swift
+- 149: `taggerscript` Tagger Script
+- 150: `tap` Test Anything Protocol
+- 151: `tcl` Tcl
+- 152: `tex` TeX
+- 153: `thrift` Thrift
+- 154: `tp` TP
+- 155: `twig` Twig
+- 156: `typescript` TypeScript
+- 157: `vala` Vala
+- 158: `vbnet` VB.NET
+- 159: `vbscript-html` VBScript in HTML
+- 160: `vbscript` VBScript
+- 161: `verilog` Verilog
+- 162: `vhdl` VHDL
+- 163: `vim` Vim Script
+- 164: `x86asm` Intel x86 Assembly
+- 165: `xl` XL
+- 166: `xml` HTML, XML
+- 167: `xquery` XQuery
+- 168: `yaml` YAML
+- 169: `zephir` Zephir
+- 170: `autodetect` Auto Detect

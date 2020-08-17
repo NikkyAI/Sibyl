@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    kotlin("plugin.serialization")
     application
 }
 
@@ -11,6 +12,8 @@ dependencies {
     implementation(project(":client:websocket"))
     implementation(project(":module:logging"))
     implementation(project(":module:roleplay"))
+    implementation(project(":module:pastee"))
+    implementation(project(":module:pastebin"))
 
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:_")
 //    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")
@@ -21,6 +24,7 @@ dependencies {
     // TODO: move into core, polling-client and websocket-client
 //    implementation(Ktor.client.core)
     implementation("io.ktor:ktor-client-okhttp:_")
+    api("io.ktor:ktor-client-core:_")
 //    implementation(Ktor.client.okHttp)
 //    implementation(Ktor.client.json)
 //    implementation(Ktor.client.serialization)
