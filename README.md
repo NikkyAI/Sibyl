@@ -15,6 +15,17 @@ run
 ./gradlew :sample:run
 ```
 
+#### TODO:
+
+- url previews
+- database stuff
+  - each module on a separate schema
+  - setup postgres (pgdata on docker)
+  - figure out migrations
+- reminders
+- leaving messages for offline people
+
+
 TODO list features
 
 - chatlogs

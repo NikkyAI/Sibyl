@@ -12,9 +12,10 @@ dependencies {
     implementation(project(":client:websocket"))
     implementation(project(":module:logging"))
     implementation(project(":module:roleplay"))
-    implementation(project(":module:pastee"))
-    implementation(project(":module:pastebin"))
-    implementation(project(":module:hastebin"))
+    implementation(project(":module:paste"))
+    implementation(project(":util:paste:pastee"))
+    implementation(project(":util:paste:pastebin"))
+    implementation(project(":util:paste:hastebin"))
 
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:_")
 //    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")

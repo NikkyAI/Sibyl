@@ -9,3 +9,78 @@ services:
     volumes:
       - ./matterbridge:/etc/matterbridge
 #    entrypoint: ["/bin/matterbridge", "-debug", "-conf", "/etc/matterbridge/matterbridge.toml"]
+#  redis:
+#    container_name: redis
+#    hostname: redis
+#    restart: unless-stopped
+#    image: redislabs/redismod:latest
+#    ports:
+#      - "6379:6379"
+#    networks:
+#      - code-network
+  redisinsight:
+    container_name: redisinsight
+    image: redislabs/redisinsight:latest
+    ports:
+      - "8001:8001"
+    volumes:
+      - "./data/redisinsight:/db"
+    networks:
+      - code-network
+  postgres:
+    container_name: postgres
+    hostname: postgres
+    restart: unless-stopped
+    image: postgres:11
+    volumes:
+      - sibyl_pgdata:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASS}
+      - POSTGRES_DB=${POSTGRES_DB}
+    networks:
+      - code-network
+#  postgres-dev: # TODO: readd when figuring out generating migrations
+#    container_name: postgres-dev
+#    hostname: postgres-dev
+#    restart: unless-stopped
+#    image: postgres:11
+#    volumes:
+#      - accounting_dev_pgdata:/var/lib/postgresql/data
+#    ports:
+#      - "${POSTGRES__DEV_PORT:-5434}:5432"
+#    environment:
+#      - POSTGRES_USER=${POSTGRES_USER}
+#      - POSTGRES_PASSWORD=${POSTGRES_PASS}
+#      - POSTGRES_DB=${POSTGRES_DB}
+#    networks:
+#      - code-network
+  pgadmin4:
+    container_name: pgadmin4
+    image: dpage/pgadmin4
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "root@nikky.moe"
+      PGADMIN_DEFAULT_PASSWORD: "${POSTGRES_PASS}"
+      PGPASSWORD: "${POSTGRES_PASS}"
+    ports:
+      - "80:80"
+    volumes:
+      - "./data/pgadmin:/var/lib/pgadmin"
+    depends_on:
+      - postgres
+      - postgres-dev
+    networks:
+      - code-network
+
+networks:
+  code-network:
+    driver: bridge
+
+volumes:
+  accounting_pgdata:
+    external: true
+  accounting_dev_pgdata:
+    external: true

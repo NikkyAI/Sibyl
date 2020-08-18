@@ -1,18 +1,20 @@
 package sibyl
 
-import LoggingModule
 import RoleplayModule
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
-import kotlinx.coroutines.*
-import sibyl.test.TestModule
+import kotlinx.coroutines.DEBUG_PROPERTY_NAME
+import kotlinx.coroutines.DEBUG_PROPERTY_VALUE_ON
+import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import sibyl.client.PollingClient
-import kotlinx.serialization.json.Json
+import sibyl.config.ConfigUtil
 import sibyl.core.CoreModule
-import sibyl.haste.HasteModule
-import sibyl.pastebin.PastebinModule
-import sibyl.pastee.PasteeModule
+import sibyl.haste.HasteService
+import sibyl.module.logging.LoggingModule
+import sibyl.pastee.PasteModule
+import sibyl.test.TestModule
 import java.io.File
 
 val jsonSerializer = Json {
@@ -28,7 +30,7 @@ private val client = HttpClient(OkHttp) {
 }
 val messageProcessor = MessageProcessor().apply {
     addModule(LoggingModule())
-    addModule(HasteModule(client))
+    addModule(PasteModule(HasteService(client)))
     addModule(RoleplayModule())
     addModule(TestModule())
 }
@@ -37,14 +39,17 @@ private val logger = KotlinLogging.logger {}
 fun main(args: Array<String>) {
     System.setProperty(DEBUG_PROPERTY_NAME, DEBUG_PROPERTY_VALUE_ON)
 
-    val connectData = File("connect.json").takeIf { it.exists() }?.readText()?.let {
-        jsonSerializerPretty.decodeFromString(ConnectData.serializer(), it)
-    } ?: ConnectData(
-        controlGateway = "matterbridgetest",
-        host = "localhost",
-        port = 4242,
-        token = null
-    )
+    val connectData = ConfigUtil.load(
+        file = File("sample.json"),
+        serializer = SampleConfig.serializer()
+    ) {
+        SampleConfig(
+            host = "localhost",
+            port = 4242,
+            token = null
+        )
+    }
+
 
     runBlocking {
         // TODO: drop all history on first connect
@@ -54,8 +59,6 @@ fun main(args: Array<String>) {
             port = connectData.port,
             token = connectData.token
         )
-
-        messageProcessor.getModule(CoreModule::class)?.controlGateway = connectData.controlGateway
 
         logger.info { "client started" }
         messageProcessor.start(send = send, receive = receive)

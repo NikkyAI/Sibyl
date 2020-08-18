@@ -1,8 +1,8 @@
 plugins {
     kotlin("jvm") apply false
     kotlin("plugin.serialization") apply false
-    id("com.vanniktech.dependency.graph.generator") version "0.5.0"
-    id("com.jfrog.bintray") version "1.8.5" apply false
+    id("com.jfrog.bintray") apply false
+    id("com.vanniktech.dependency.graph.generator")
 }
 
 val bintrayOrg: String? = System.getenv("BINTRAY_USER")
@@ -15,14 +15,14 @@ var bintrayPackage = "sibyl"
 group = "moe.nikky.sibyl"
 description = "modular chatbot framework for matterbridge"
 
-fun captureExec(configure: ExecSpec.()->Unit): String? {
+fun captureExec(configure: ExecSpec.() -> Unit): String? {
     val stdout = java.io.ByteArrayOutputStream()
     try {
         exec {
             configure()
             standardOutput = stdout
         }
-    }catch (e: org.gradle.process.internal.ExecException) {
+    } catch (e: org.gradle.process.internal.ExecException) {
         logger.error(e.message)
         return null
     }
@@ -47,13 +47,13 @@ val describeAbbrevAlways = captureExec {
     commandLine("git", "describe", "--abbrev=0", "--always")
 }?.trim() ?: "v0.0.0"
 
-logger.lifecycle( "describeTagsAlways: '$describeTagsAlways'" )
-logger.lifecycle( "tag: '$describeAbbrevTags'" )
-logger.lifecycle( "tag2: '$describeTags'" )
-logger.lifecycle( "commit-hash: '$describeAbbrevAlways'" )
+logger.lifecycle("describeTagsAlways: '$describeTagsAlways'")
+logger.lifecycle("tag: '$describeAbbrevTags'")
+logger.lifecycle("tag2: '$describeTags'")
+logger.lifecycle("commit-hash: '$describeAbbrevAlways'")
 
 val isSnapshot = describeTagsAlways != describeAbbrevTags
-val versionStr: String = if(isSnapshot && describeAbbrevTags.startsWith("v")) {
+val versionStr: String = if (isSnapshot && describeAbbrevTags.startsWith("v")) {
     val lastVersion = describeAbbrevTags.substringAfter("v")
     var (major, minor, patch) = lastVersion.split('.').map { it.toInt() }
     patch++
@@ -75,6 +75,8 @@ subprojects {
         mavenCentral()
         maven(url = "https://kotlin.bintray.com/ktor")
     }
+
+    project.displayName// = project.path.drop(1).replace(':','-')
 
     project.group = rootProject.group
     project.version = versionStr
@@ -121,12 +123,12 @@ subprojects {
 //            dryRun = true // TODO: disable on github actions
             setPublications(publicationName)
             pkg(delegateClosureOf<com.jfrog.bintray.gradle.BintrayExtension.PackageConfig> {
-                repo =  bintrayRepository
+                repo = bintrayRepository
                 name = bintrayPackage
                 userOrg = bintrayOrg
                 version = VersionConfig().apply {
                     // do not put commit hashes in vcs tag
-                    if(!isSnapshot) {
+                    if (!isSnapshot) {
                         vcsTag = describeTagsAlways
                     }
 //                    vcsTag = describeAbbrevAlwaysTags
@@ -157,15 +159,21 @@ dependencyGraphGenerator {
             true
         },
         projectNode = { node, b ->
-            node.add(
-                guru.nidi.graphviz.attribute.Color.SLATEGRAY,
-                guru.nidi.graphviz.attribute.Color.AQUAMARINE.background().fill(),
-                guru.nidi.graphviz.attribute.Style.FILLED
-            )
+            node
+//                .setName(b.path.drop(1).replace(':', '-'))
+                .add(
+                    guru.nidi.graphviz.attribute.Color.SLATEGRAY,
+                    guru.nidi.graphviz.attribute.Color.AQUAMARINE.background().fill(),
+                    guru.nidi.graphviz.attribute.Style.FILLED
+                )
         },
         includeProject = { project ->
             logger.lifecycle("project: $project")
             project.buildFile.exists()
+        },
+        dependencyNode = { node, dep ->
+            logger.lifecycle("dep node $dep ${dep::class}")
+            node
         }
     )
 }
@@ -173,6 +181,7 @@ dependencyGraphGenerator {
 tasks {
     withType(com.vanniktech.dependency.graph.generator.DependencyGraphGeneratorTask::class).all {
         doFirst {
+            logger.lifecycle("cleaning output")
             outputDirectory = outputDirectory.resolve(generator.name)
             outputDirectory.deleteRecursively()
             outputDirectory.mkdirs()

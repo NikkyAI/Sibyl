@@ -11,9 +11,10 @@ import sibyl.api.ApiMessage
 import sibyl.commands.BufferConsole
 import sibyl.commands.SibylCommand
 import sibyl.commands.runCommand
+import sibyl.config.ConfigUtil
+import java.io.File
 
 class CoreModule : SibylModule("core", "core framework functionality") {
-    lateinit var controlGateway: String // load this from messageProcessor ?
     companion object {
         private val logger = KotlinLogging.logger {}
 
@@ -35,28 +36,35 @@ class CoreModule : SibylModule("core", "core framework functionality") {
     }
 
     override fun start() {
-        Runtime.getRuntime().addShutdownHook(Thread {
+        val config = ConfigUtil.load(File("core.json"), CoreConfig.serializer()) {
+            CoreConfig()
+        }
+
+        if(config.controlGateway != null) {
+            Runtime.getRuntime().addShutdownHook(Thread {
+                runBlocking {
+                    logger.info { "sending shutdown message" }
+                    sendMessage(
+                        ApiMessage(
+                            gateway = config.controlGateway,
+                            text = "shutting down"
+                        ),
+                        stage = null
+                    )
+                    delay(100)
+                }
+            })
             runBlocking {
-                logger.info { "sending shutdown message" }
                 sendMessage(
                     ApiMessage(
-                        gateway = controlGateway, // TODO: make control gateway configurable
-                        text = "shutting down"
+                        gateway = config.controlGateway,
+                        text = "starting up"
                     ),
                     stage = null
                 )
-                delay(100)
             }
-        })
-        runBlocking {
-            sendMessage(
-                ApiMessage(
-                    gateway = controlGateway, // TODO: make control gateway configurable
-                    text = "starting up"
-                ),
-                stage = null
-            )
         }
+
     }
 
     private suspend fun filterIncoming(message: ApiMessage, stage: Stage): ApiMessage? {
