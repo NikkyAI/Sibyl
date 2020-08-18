@@ -10,7 +10,6 @@ import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import sibyl.client.PollingClient
 import sibyl.config.ConfigUtil
-import sibyl.core.CoreModule
 import sibyl.haste.HasteService
 import sibyl.module.logging.LoggingModule
 import sibyl.pastee.PasteModule
