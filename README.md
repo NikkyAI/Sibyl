@@ -2,8 +2,8 @@
 
 modular matterbridge bot framework
 
-![Bintray](https://img.shields.io/bintray/v/nikkyai/github/sibyl?style=for-the-badge)
-![Bintray](https://img.shields.io/bintray/v/nikkyai/github/sibyl-dev?style=for-the-badge)
+[![Bintray](https://img.shields.io/bintray/v/nikkyai/github/sibyl?style=for-the-badge)](https://bintray.com/nikkyai/github/sibyl)
+[![Bintray](https://img.shields.io/bintray/v/nikkyai/github/sibyl-dev?style=for-the-badge)](https://bintray.com/nikkyai/github/sibyl-dev)
 
 
 ### setup
