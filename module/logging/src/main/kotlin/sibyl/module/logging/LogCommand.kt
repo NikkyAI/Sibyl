@@ -5,11 +5,23 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.restrictTo
+import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.DateTimeFormatter
 import sibyl.commands.SibylCommand
-import java.io.File
+import sibyl.sibyl_logging.db.generated.tables.records.LogsRecord
+import sibyl.withIndent
 
-class LogCommand(val logsFolder: File) : SibylCommand(
+class LogCommand(
+    val loggingModule: LoggingModule,
+    val dtFormat: DateTimeFormatter = DateTimeFormat.forPattern(LoggingModule.defaultConfig.dateFormat ?: "yyyy-MM-dd HH:mm:ss"),
+    val messageFormat: (LogsRecord, DateTimeFormatter) -> String = { logsRecord, dtf ->
+        val prefix = "${DateTime(logsRecord.timestamp.toInstant().toEpochMilli()).toString(dtf)} <${logsRecord.username} ${logsRecord.userid}> "
+        prefix + logsRecord.text.withIndent("", " ".repeat(prefix.length))
+    }
+) : SibylCommand(
     name = "log",
     help = "replay log"
 ) {
@@ -19,21 +31,11 @@ class LogCommand(val logsFolder: File) : SibylCommand(
     val numberOfLines by argument("LINES").int().restrictTo(min = 1)
     val skipCommands by option("--skip-commands").flag(default = false)
     override fun run() {
-        val logFile = logsFolder.resolve(message.gateway + ".log")
-        var countdown = numberOfLines + 1
-        val allLines = logFile.readLines().asSequence().filter {  line ->
-            if(skipCommands) {
-                !line.startsWith("!")
-            } else true
+        val messages = runBlocking {
+            loggingModule.getLogs(message.gateway, numberOfLines, skipCommands = skipCommands)
         }
-        val logLines = logFile.readLines().takeLastWhile { line ->
-            if(!line.startsWith(" ")) {
-                countdown--
-            }
-            countdown > 0
-        }
-        logLines.forEach { line ->
-            echo(line)
+        messages.forEach { record ->
+            echo(messageFormat(record, dtFormat))
         }
     }
 }

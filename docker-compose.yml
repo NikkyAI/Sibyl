@@ -1,14 +1,14 @@
 version: '3.7'
 services:
-  matterbridge:
-    image: 42wim/matterbridge:stable
-    restart: unless-stopped
-    ports:
-      - "4242:4242"
-      - "4343:4343"
-    volumes:
-      - ./matterbridge:/etc/matterbridge
-#    entrypoint: ["/bin/matterbridge", "-debug", "-conf", "/etc/matterbridge/matterbridge.toml"]
+#  matterbridge:
+#    image: 42wim/matterbridge:stable
+#    restart: unless-stopped
+#    ports:
+#      - "4242:4242"
+#      - "4343:4343"
+#    volumes:
+#      - ./matterbridge:/etc/matterbridge
+##    entrypoint: ["/bin/matterbridge", "-debug", "-conf", "/etc/matterbridge/matterbridge.toml"]
 #  redis:
 #    container_name: redis
 #    hostname: redis
@@ -18,15 +18,15 @@ services:
 #      - "6379:6379"
 #    networks:
 #      - code-network
-  redisinsight:
-    container_name: redisinsight
-    image: redislabs/redisinsight:latest
-    ports:
-      - "8001:8001"
-    volumes:
-      - "./data/redisinsight:/db"
-    networks:
-      - code-network
+#  redisinsight:
+#    container_name: redisinsight
+#    image: redislabs/redisinsight:latest
+#    ports:
+#      - "8001:8001"
+#    volumes:
+#      - "./data/redisinsight:/db"
+#    networks:
+#      - code-network
   postgres:
     container_name: postgres
     hostname: postgres
@@ -66,12 +66,12 @@ services:
       PGADMIN_DEFAULT_PASSWORD: "${POSTGRES_PASS}"
       PGPASSWORD: "${POSTGRES_PASS}"
     ports:
-      - "80:80"
+      - "5480:80"
     volumes:
       - "./data/pgadmin:/var/lib/pgadmin"
     depends_on:
       - postgres
-      - postgres-dev
+#      - postgres-dev
     networks:
       - code-network
 
@@ -80,7 +80,7 @@ networks:
     driver: bridge
 
 volumes:
-  accounting_pgdata:
+  sibyl_pgdata:
     external: true
-  accounting_dev_pgdata:
-    external: true
+#  sibyl_dev_pgdata:
+#    external: true

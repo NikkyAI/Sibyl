@@ -1,7 +1,25 @@
+import org.jooq.meta.jaxb.*
+import org.jooq.meta.jaxb.Configuration
+import org.jooq.meta.jaxb.Target
+import org.jooq.codegen.GenerationTool
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.jooq:jooq:_")
+        classpath("org.jooq:jooq-meta:_")
+        classpath("org.jooq:jooq-codegen:_")
+        classpath("org.postgresql:postgresql:_")
+    }
+}
+
 plugins {
     kotlin("jvm") apply false
     kotlin("plugin.serialization") apply false
     id("com.jfrog.bintray") apply false
+    id("org.flywaydb.flyway") apply false
     id("com.vanniktech.dependency.graph.generator")
 }
 
@@ -142,6 +160,124 @@ subprojects {
 //                setLicenses("MIT")
 //                issueTrackerUrl = issues
             })
+        }
+    }
+
+    plugins.withId("org.flywaydb.flyway") {
+        val envProps = loadProperties(rootDir.resolve(".env"))
+        val pgHost = "localhost"
+        val pgDb = envProps["POSTGRES_DB"].toString()
+        val pgUser = envProps["POSTGRES_USER"].toString()
+        val pgPass = envProps["POSTGRES_PASS"].toString()
+        val pgPort = envProps["POSTGRES_PORT"].toString()
+        val schema = "sibyl-" + project.name
+        configure<org.flywaydb.gradle.FlywayExtension> {
+            url = "jdbc:postgresql://$pgHost:$pgPort/$pgDb"
+            user = pgUser
+            password = pgPass
+            schemas = arrayOf(schema)
+            // TODO: only add test sources in dev env
+            locations = arrayOf(
+                "filesystem:" + file("src/main/resources/migration").path,
+                "filesystem:" + file("src/test/resources/migration").path
+            )
+            baselineVersion = "0"
+        }
+
+        val generatedSrcFolder = projectDir.resolve("generated-src").apply { mkdirs() }
+
+        configure<SourceSetContainer> {
+            named<SourceSet>("main") {
+                java {
+                    srcDirs(generatedSrcFolder)
+                }
+            }
+        }
+
+        apply(plugin = "idea")
+        configure<org.gradle.plugins.ide.idea.model.IdeaModel> {
+            module {
+                generatedSourceDirs.plusAssign(generatedSrcFolder)
+            }
+        }
+
+        project.dependencies {
+            add("implementation", "joda-time:joda-time:_")
+            add("implementation", "org.postgresql:postgresql:_")
+            add("implementation", "com.zaxxer:HikariCP:_")
+            add("implementation", "org.flywaydb:flyway-core:_")
+            add("implementation", "org.jooq:jooq:_")
+        }
+
+        tasks {
+            val cleanJooq by registering(Delete::class) {
+                group = "jooq"
+                description = "deletes $generatedSrcFolder"
+                delete.plusAssign(generatedSrcFolder)
+            }
+            // custom task to generate jooq code
+            val generateJooq by registering(DefaultTask::class) {
+                group = "jooq"
+                description = "runs jooq-generator and writes to $generatedSrcFolder"
+
+                dependsOn(cleanJooq)
+
+                outputs.dir(generatedSrcFolder)
+                outputs.upToDateWhen { false }
+
+                doFirst {
+//                val properties = loadProperties(localPropertiesDefaultFile, localPropertiesFile)
+//                val pgDb = properties.getProperty("pg.db")
+//                val pgHost = properties.getProperty("pg.host")
+//                val pgUser = properties.getProperty("pg.user")
+//                val pgPass = properties.getProperty("pg.pass")
+
+                    val configuration = Configuration().apply {
+                        jdbc = Jdbc().apply {
+                            driver = "org.postgresql.Driver"
+                            url = "jdbc:postgresql://$pgHost:$pgPort/$pgDb"
+                            user = pgUser
+                            password = pgPass
+                        }
+                        generator = Generator().apply {
+                            database = Database().apply {
+                                name = "org.jooq.meta.postgres.PostgresDatabase"
+                                inputSchema = schema
+                            }
+
+                            strategy = Strategy()
+
+                            generate = object : Generate() {
+                                init {
+                                    deprecated = false
+                                    records = true
+                                    daos = false
+                                    immutablePojos = true
+                                    fluentSetters = true
+                                    javaTimeTypes = false // java8 time api
+                                    serializablePojos = false
+
+                                    // requires jpa
+                                    jpaAnnotations = false
+                                    validationAnnotations = false
+                                    springAnnotations = false
+                                }
+                            }
+
+                            target = Target().apply {
+                                packageName = "sibyl.$schema.db.generated"
+                                directory = generatedSrcFolder.path
+                            }
+                        }
+                    }
+                    GenerationTool.generate(configuration)
+                }
+            }
+            val compileKotlin by existing {
+                if (!generatedSrcFolder.exists() || generatedSrcFolder.listFiles().size == 0) {
+                    dependsOn(generateJooq)
+                }
+            }
         }
     }
 }

@@ -7,7 +7,7 @@ buildscript {
 }
 
 bootstrapRefreshVersionsAndDependencies(
-    listOf(rootDir.resolve("dependencies-rules.txt").readText())
+    listOf(rootDir.resolve("buildSrc/dependencies-rules.txt").readText())
 )
 
 rootProject.name = "Sibyl"

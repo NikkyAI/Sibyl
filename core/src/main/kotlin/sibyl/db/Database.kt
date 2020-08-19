@@ -1,0 +1,65 @@
+package sibyl.db
+
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
+import org.flywaydb.core.Flyway
+import org.flywaydb.core.internal.configuration.ConfigUtils
+import sibyl.config.ConfigUtil
+import java.io.File
+import javax.sql.DataSource
+
+object Database {
+    /**
+     * this function initializes [dataSourceForSchema]
+     */
+    fun dataSourceForSchema(schema: String): DataSource {
+        val config = ConfigUtil.load(File("database.json"), DatabaseConfig.serializer()) {
+            DatabaseConfig("localhost")
+        }
+
+        return HikariDataSource(
+            HikariConfig().apply {
+                jdbcUrl = "jdbc:postgresql://${config.host}:${config.port}/${config.database}"
+                username = config.user
+                password = config.password
+                this.schema = schema
+                addDataSourceProperty( "cachePrepStmts" , "true" )
+                addDataSourceProperty( "prepStmtCacheSize" , "250" )
+                addDataSourceProperty( "prepStmtCacheSqlLimit" , "2048" )
+            }
+        )
+    }
+
+    private fun configureFlyway(dataSource: DataSource): Flyway = Flyway.configure()
+        .baselineVersion("0")
+        .schemas(dataSource.connection.schema) // get schema from connection
+        .locations("classpath:migration")
+        .dataSource(dataSource)
+        .load()
+
+    fun flywayCleanBaseline(dataSource: DataSource) {
+        val flyway = configureFlyway(dataSource)
+
+        flyway.clean()
+        flyway.baseline()
+    }
+
+    fun flywayMigrate(dataSource: DataSource) {
+        val flyway = configureFlyway(dataSource)
+
+        flyway.migrate()
+        flyway.validate()
+    }
+
+    fun flywayInfo(dataSource: DataSource) {
+        val flyway = configureFlyway(dataSource)
+
+        flyway.info()
+    }
+
+    fun flywayValidate(dataSource: DataSource) {
+        val flyway = configureFlyway(dataSource)
+
+        flyway.validate()
+    }
+}

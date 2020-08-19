@@ -37,6 +37,7 @@ val messageProcessor = MessageProcessor().apply {
 private val logger = KotlinLogging.logger {}
 fun main(args: Array<String>) {
     System.setProperty(DEBUG_PROPERTY_NAME, DEBUG_PROPERTY_VALUE_ON)
+    System.setProperty("org.jooq.no-logo", "true")
 
     val connectData = ConfigUtil.load(
         file = File("sample.json"),
@@ -48,7 +49,6 @@ fun main(args: Array<String>) {
             token = null
         )
     }
-
 
     runBlocking {
         // TODO: drop all history on first connect

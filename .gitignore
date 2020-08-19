@@ -31,7 +31,9 @@ gradle-app.setting
 hs_err_pid*
 .attach_pid*
 
+generated-src/
 run/
+data/
 *.log
 
 # config file

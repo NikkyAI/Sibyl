@@ -2,6 +2,7 @@
 
 ### 0.0.3
 
+- add json schema based configuration
 - add pastebin, paste.ee and hastebin modules
 
 ### 0.0.2
