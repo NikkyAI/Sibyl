@@ -35,7 +35,7 @@ class CoreModule : SibylModule("core", "core framework functionality") {
         registerIncomingInterceptor(Stage.COMMANDS, ::processCommands)
     }
 
-    override fun start() {
+    override suspend fun start() {
         val config = ConfigUtil.load(File("core.json"), CoreConfig.serializer()) {
             CoreConfig()
         }

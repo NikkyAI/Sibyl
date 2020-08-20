@@ -36,7 +36,7 @@ abstract class SibylModule(
     open fun MessageProcessor.setup() {
 
     }
-    open fun start() {
+    open suspend fun start() {
 
     }
 

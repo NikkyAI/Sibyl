@@ -57,7 +57,7 @@ class LoggingModule(
         logger.info { "loaded data source" }
     }
 
-    override fun start() {
+    override suspend fun start() {
         logsFolder.mkdirs()
     }
 

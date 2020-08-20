@@ -7,6 +7,6 @@ class WhoAmICommand : SibylCommand(
     help = "displays userid on the current platform"
 ) {
     override fun run() {
-        echo(message.userid + " " + message.account)
+        echo(causeMessage.userid + " " + causeMessage.account)
     }
 }

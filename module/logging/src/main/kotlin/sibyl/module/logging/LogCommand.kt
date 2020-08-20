@@ -8,7 +8,6 @@ import com.github.ajalt.clikt.parameters.types.restrictTo
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import sibyl.commands.SibylCommand
-import sibyl.sibyl_logging.db.generated.tables.records.LogsRecord
 
 class LogCommand(
     private val loggingModule: LoggingModule
@@ -23,7 +22,7 @@ class LogCommand(
     val skipCommands by option("--skip-commands").flag(default = false)
     override fun run() {
         val messages = runBlocking {
-            loggingModule.getLogs(message.gateway, numberOfLines, skipCommands = skipCommands)
+            loggingModule.getLogs(causeMessage.gateway, numberOfLines, skipCommands = skipCommands)
         }
         messages.forEach { record ->
             echo(loggingModule.messageFormat(record, loggingModule.dtFormat))

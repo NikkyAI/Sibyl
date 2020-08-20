@@ -9,28 +9,8 @@ plugins {
 
 dependencies {
     implementation(project(":core"))
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")
+
 //    implementation("com.squareup.sqldelight:jdbc-driver:_")
 }
-//
-//sqldelight {
-//    database("RemindersDatabase") {
-//        packageName = "sibyl.db"
-//        dialect = "postgresql"
-//        sourceFolders = listOf("sqldelight")
-//        deriveSchemaFromMigrations = true
-//        migrationOutputDirectory = file("$buildDir/resources/main/migrations")
-//        migrationOutputFileFormat = ".sql"
-//    }
-//}
-//
-//idea {
-//    module {
-//        sourceDirs = sourceDirs + file("src/main/sqldelight")
-//    }
-//}
-//
-//tasks {
-//    compileKotlin.configure {
-//        dependsOn("generateRemindersDatabaseMigrations")
-//    }
-//}

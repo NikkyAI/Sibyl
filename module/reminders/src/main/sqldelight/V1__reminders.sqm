@@ -1,16 +1,21 @@
-import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 
 CREATE TABLE reminders (
---     id SERIAL                  NOT NULL PRIMARY KEY,
-    id        INTEGER
+    id        SERIAL
         NOT NULL PRIMARY KEY,
-    timestamp TIMESTAMP as DateTime
-        NOT NULL,
     message   TEXT
         NOT NULL,
     username  TEXT
         NOT NULL,
     userid    TEXT
-        NOT NULL
+        NOT NULL,
+    gateway   TEXT
+        NOT NULL,
+    requestedAt  TIMESTAMP AS LocalDateTime
+        NOT NULL,
+    target TIMESTAMP AS LocalDateTime
+        NOT NULL,
+    fulfilledAt  TIMESTAMP AS LocalDateTime
+        DEFAULT NULL
 );
 

@@ -25,6 +25,7 @@ object Database {
                 addDataSourceProperty( "cachePrepStmts" , "true" )
                 addDataSourceProperty( "prepStmtCacheSize" , "250" )
                 addDataSourceProperty( "prepStmtCacheSqlLimit" , "2048" )
+                addDataSourceProperty( "stringtype" , "unspecified" )
             }
         )
     }

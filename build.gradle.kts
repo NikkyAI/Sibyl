@@ -166,7 +166,12 @@ subprojects {
     }
 
     afterEvaluate {
-
+        if(project.plugins.hasPlugin("org.jetbrains.kotlin.jvm")) {
+            tasks {
+                val compileKotlin by existing(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class) { kotlinOptions.jvmTarget = "1.8" }
+                val compileTestKotlin by existing(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class) { kotlinOptions.jvmTarget = "1.8" }
+            }
+        }
         if(pluginManager.hasPlugin("org.flywaydb.flyway") && !pluginManager.hasPlugin("com.squareup.sqldelight")) {
             logger.lifecycle("configuring jooq")
 

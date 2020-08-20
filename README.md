@@ -31,6 +31,7 @@ run
   - figure out migrations
 - reminders
 - leaving messages for offline people
+- publish to oss sonatype (look at sqldelight as example)
 - sibyl-launcher (kotlin-scripting based executable jar)
 
 

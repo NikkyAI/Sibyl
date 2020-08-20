@@ -17,10 +17,6 @@ class PasteModule(
         registerOutgoingInterceptor(Stage.FILTER, interceptor = ::shortenOutgoing)
     }
 
-    override fun start() {
-
-    }
-
     private suspend fun shortenOutgoing(response: ResponseMessage, stage: Stage): ResponseMessage? {
         val message = response.message
         if (message.text.lines().size > maxLines) {

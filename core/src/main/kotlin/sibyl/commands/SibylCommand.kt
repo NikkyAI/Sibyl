@@ -36,7 +36,7 @@ abstract class SibylCommand(
     }
 
     private lateinit var messageContext: ApiMessage
-    val message: ApiMessage
+    val causeMessage: ApiMessage
         get() =
             (currentContext.findRoot().command as? SibylCommand)?.messageContext ?: messageContext
             ?: error("cannot find message context")

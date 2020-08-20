@@ -1,6 +1,29 @@
-
 selectAll:
     SELECT *
     FROM reminders
 ;
 
+selectUnfulfilled:
+    SELECT *
+    FROM reminders
+    WHERE fulfilledAt IS NULL
+        AND target < :now
+;
+
+setFulFilled:
+    UPDATE reminders
+        SET fulfilledAt = :fulfilledAt
+        WHERE id = :id
+
+;
+
+insert:
+    INSERT INTO reminders VALUES ?
+;
+
+selectMaxId:
+    SELECT id
+    FROM reminders
+    ORDER BY id DESC
+    LIMIT 1
+;
