@@ -4,7 +4,7 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import mu.KotlinLogging
-import sibyl.pastee.PasteService
+import sibyl.module.paste.PasteService
 
 class PastebinService(
     val httpClient: HttpClient,

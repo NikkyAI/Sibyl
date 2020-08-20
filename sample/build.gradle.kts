@@ -11,6 +11,7 @@ dependencies {
     implementation(project(":client:polling"))
     implementation(project(":client:websocket"))
     implementation(project(":module:logging"))
+//    implementation(project(":module:reminders"))
     implementation(project(":module:roleplay"))
     implementation(project(":module:paste"))
     implementation(project(":util:paste:pastee"))
@@ -21,17 +22,11 @@ dependencies {
 //    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")
 
 //    implementation("io.github.microutils:kotlin-logging:_")
-//    implementation("ch.qos.logback:logback-classic:_")
+    implementation("ch.qos.logback:logback-classic:_")
 
-    // TODO: move into core, polling-client and websocket-client
-//    implementation(Ktor.client.core)
+//    implementation("io.ktor:ktor-client-core:_")
     implementation("io.ktor:ktor-client-okhttp:_")
-    api("io.ktor:ktor-client-core:_")
-//    implementation(Ktor.client.okHttp)
-//    implementation(Ktor.client.json)
-//    implementation(Ktor.client.serialization)
-//    implementation(Ktor.client.websockets)
-    implementation("io.ktor:ktor-client-websockets:_") // not available on 1.3.2-1.4.0-rc
+    implementation("io.ktor:ktor-client-websockets:_")
 }
 
 

@@ -1,4 +1,19 @@
 import de.fayard.dependencies.bootstrapRefreshVersionsAndDependencies
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
+        gradlePluginPortal()
+    }
+    resolutionStrategy {
+        eachPlugin {
+            when(requested.id.id) {
+//                "com.squareup.sqldelight" -> useModule("com.squareup.sqldelight:gradle-plugin:1.4.0")
+            }
+        }
+    }
+}
 buildscript {
     repositories {
         gradlePluginPortal()
@@ -21,6 +36,7 @@ include(":core")
 include(":client:polling")
 include(":client:websocket")
 include(":module:logging")
+//include(":module:reminders")
 include(":module:roleplay")
 include(":util:paste:pastee")
 include(":util:paste:pastebin")

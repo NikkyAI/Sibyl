@@ -15,12 +15,7 @@ import sibyl.sibyl_logging.db.generated.tables.records.LogsRecord
 import sibyl.withIndent
 
 class LogCommand(
-    val loggingModule: LoggingModule,
-    val dtFormat: DateTimeFormatter = DateTimeFormat.forPattern(LoggingModule.defaultConfig.dateFormat ?: "yyyy-MM-dd HH:mm:ss"),
-    val messageFormat: (LogsRecord, DateTimeFormatter) -> String = { logsRecord, dtf ->
-        val prefix = "${DateTime(logsRecord.timestamp.toInstant().toEpochMilli()).toString(dtf)} <${logsRecord.username} ${logsRecord.userid}> "
-        prefix + logsRecord.text.withIndent("", " ".repeat(prefix.length))
-    }
+    private val loggingModule: LoggingModule
 ) : SibylCommand(
     name = "log",
     help = "replay log"
@@ -35,7 +30,7 @@ class LogCommand(
             loggingModule.getLogs(message.gateway, numberOfLines, skipCommands = skipCommands)
         }
         messages.forEach { record ->
-            echo(messageFormat(record, dtFormat))
+            echo(loggingModule.messageFormat(record, loggingModule.dtFormat))
         }
     }
 }

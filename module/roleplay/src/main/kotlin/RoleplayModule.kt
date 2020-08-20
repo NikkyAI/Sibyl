@@ -26,6 +26,8 @@ class RoleplayModule : SibylModule("roleplay", "throw dice and other things, onl
     private suspend fun processDiceRolls(message: ApiMessage, stage: Stage): ApiMessage {
         val matches = diceRegex.findAll(message.text).toList()
 
+        if(matches.isEmpty()) return message
+
         // Prepare and validate some stuff.
 
         val rolls = matches.map { match ->

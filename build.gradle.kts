@@ -1,7 +1,7 @@
+import org.jooq.codegen.GenerationTool
 import org.jooq.meta.jaxb.*
 import org.jooq.meta.jaxb.Configuration
 import org.jooq.meta.jaxb.Target
-import org.jooq.codegen.GenerationTool
 
 buildscript {
     repositories {
@@ -20,6 +20,7 @@ plugins {
     kotlin("plugin.serialization") apply false
     id("com.jfrog.bintray") apply false
     id("org.flywaydb.flyway") apply false
+    id("com.squareup.sqldelight") version "1.5.0-SNAPSHOT" apply false
     id("com.vanniktech.dependency.graph.generator")
 }
 
@@ -92,6 +93,7 @@ subprojects {
         jcenter()
         mavenCentral()
         maven(url = "https://kotlin.bintray.com/ktor")
+        maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
     }
 
     project.displayName// = project.path.drop(1).replace(':','-')

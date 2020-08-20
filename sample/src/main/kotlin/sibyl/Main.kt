@@ -12,7 +12,7 @@ import sibyl.client.PollingClient
 import sibyl.config.ConfigUtil
 import sibyl.haste.HasteService
 import sibyl.module.logging.LoggingModule
-import sibyl.pastee.PasteModule
+import sibyl.module.paste.PasteModule
 import sibyl.test.TestModule
 import java.io.File
 

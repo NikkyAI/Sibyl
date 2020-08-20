@@ -28,8 +28,8 @@ services:
 #    networks:
 #      - code-network
   postgres:
-    container_name: postgres
-    hostname: postgres
+#    container_name: sibyl_postgres
+    hostname: sibyl_postgres
     restart: unless-stopped
     image: postgres:11
     volumes:
@@ -58,7 +58,7 @@ services:
 #    networks:
 #      - code-network
   pgadmin4:
-    container_name: pgadmin4
+#    container_name: pgadmin4
     image: dpage/pgadmin4
     restart: unless-stopped
     environment:

@@ -12,7 +12,7 @@ object Database {
     /**
      * this function initializes [dataSourceForSchema]
      */
-    fun dataSourceForSchema(schema: String): DataSource {
+    fun dataSourceForSchema(schema: String): HikariDataSource {
         val config = ConfigUtil.load(File("database.json"), DatabaseConfig.serializer()) {
             DatabaseConfig("localhost")
         }

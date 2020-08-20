@@ -9,6 +9,9 @@ modular matterbridge bot framework
 ### setup
 
 TODO: publish to bintray, so i can write about how you can add it as dependency here
+```
+docker volume create sibyl_pgdata
+```
 
 ### running the sample application
 
@@ -28,6 +31,7 @@ run
   - figure out migrations
 - reminders
 - leaving messages for offline people
+- sibyl-launcher (kotlin-scripting based executable jar)
 
 
 TODO list features

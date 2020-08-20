@@ -1,4 +1,4 @@
-package sibyl.pastee
+package sibyl.module.paste
 
 import io.ktor.client.*
 import sibyl.MessageProcessor

@@ -1,4 +1,4 @@
-package sibyl.pastee
+package sibyl.module.paste
 
 interface PasteService {
     /**

@@ -1,4 +1,4 @@
-package sibyl.pastee.paste
+package sibyl.module.paste.paste
 
 import kotlinx.serialization.Serializable
 

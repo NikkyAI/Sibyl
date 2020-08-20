@@ -5,7 +5,7 @@ import io.ktor.content.*
 import io.ktor.http.*
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
-import sibyl.pastee.PasteService
+import sibyl.module.paste.PasteService
 
 class HasteService(
     val httpClient: HttpClient,

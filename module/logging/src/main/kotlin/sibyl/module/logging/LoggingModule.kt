@@ -2,6 +2,7 @@ package sibyl.module.logging
 
 import kotlinx.coroutines.future.await
 import mu.KotlinLogging
+import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import sibyl.*
@@ -21,7 +22,11 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 class LoggingModule(
-    val dtFormat: DateTimeFormatter = DateTimeFormat.forPattern(defaultConfig.dateFormat ?: "yyyy-MM-dd HH:mm:ss")
+    internal val dtFormat: DateTimeFormatter = DateTimeFormat.forPattern(defaultConfig.dateFormat ?: "yyyy-MM-dd HH:mm:ss"),
+    internal val messageFormat: (LogsRecord, DateTimeFormatter) -> String = { logsRecord, dtf ->
+        val prefix = "${DateTime(logsRecord.timestamp.toInstant().toEpochMilli()).toString(dtf)} <${logsRecord.username} ${logsRecord.userid}> "
+        prefix + logsRecord.text.withIndent("", " ".repeat(prefix.length))
+    }
 ) : SibylModule("log", "logs messages and allows you to retrieve them") {
     companion object {
         private val logger = KotlinLogging.logger {}
@@ -37,7 +42,7 @@ class LoggingModule(
     val logsFolder = File("logs")
 
     override val commands = listOf(
-        LogCommand(this, dtFormat)
+        LogCommand(this)
     )
 
     private lateinit var dataSource: DataSource
@@ -120,10 +125,10 @@ class LoggingModule(
                     where(Tables.LOGS.TEXT.startsWith("!").not())
                 }
                 .select()
-                .orderBy(Tables.LOGS.TIMESTAMP.asc())
+                .orderBy(Tables.LOGS.TIMESTAMP.desc())
                 .limit(amount)
                 .fetchAsync()
-        }.await().filterNotNull().toList()
+        }.await().filterNotNull().reversed()
         return messages
     }
 }
