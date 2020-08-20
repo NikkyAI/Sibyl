@@ -1,0 +1,16 @@
+import org.joda.time.DateTime;
+
+CREATE TABLE reminders (
+--     id SERIAL                  NOT NULL PRIMARY KEY,
+    id        INTEGER
+        NOT NULL PRIMARY KEY,
+    timestamp TIMESTAMP as DateTime
+        NOT NULL,
+    message   TEXT
+        NOT NULL,
+    username  TEXT
+        NOT NULL,
+    userid    TEXT
+        NOT NULL
+);
+

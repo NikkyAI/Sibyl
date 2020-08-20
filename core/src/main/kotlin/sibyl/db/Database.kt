@@ -3,7 +3,6 @@ package sibyl.db
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.flywaydb.core.Flyway
-import org.flywaydb.core.internal.configuration.ConfigUtils
 import sibyl.config.ConfigUtil
 import java.io.File
 import javax.sql.DataSource
@@ -33,7 +32,7 @@ object Database {
     private fun configureFlyway(dataSource: DataSource): Flyway = Flyway.configure()
         .baselineVersion("0")
         .schemas(dataSource.connection.schema) // get schema from connection
-        .locations("classpath:migration")
+        .locations("classpath:migrations/${dataSource.connection.schema}")
         .dataSource(dataSource)
         .load()
 

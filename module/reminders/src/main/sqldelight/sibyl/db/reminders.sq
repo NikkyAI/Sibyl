@@ -1,0 +1,6 @@
+
+selectAll:
+    SELECT *
+    FROM reminders
+;
+

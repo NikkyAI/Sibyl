@@ -1,8 +1,0 @@
-import org.joda.time.DateTime;
-
-CREATE TABLE reminders (
-    id SERIAL NOT NULL PRIMARY KEY,
-    timestamp TIMESTAMP as DateTime NOT NULL,
-    message TEXT NOT NULL
-);
-

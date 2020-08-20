@@ -14,9 +14,11 @@ dependencies {
 
     api(project(":util:json-schema-serialization"))
 
-    api("org.jooq:jooq:_")
-
     api("joda-time:joda-time:_")
+
+    api("org.jooq:jooq:_")
+    api("org.flywaydb:flyway-core:_")
+    api("com.zaxxer:HikariCP:_")
 
     api("com.github.ajalt:clikt:_")
 

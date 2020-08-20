@@ -7,12 +7,8 @@ import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.restrictTo
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.DateTimeFormatter
 import sibyl.commands.SibylCommand
 import sibyl.sibyl_logging.db.generated.tables.records.LogsRecord
-import sibyl.withIndent
 
 class LogCommand(
     private val loggingModule: LoggingModule

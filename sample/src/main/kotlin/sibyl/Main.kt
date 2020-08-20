@@ -13,6 +13,7 @@ import sibyl.config.ConfigUtil
 import sibyl.haste.HasteService
 import sibyl.module.logging.LoggingModule
 import sibyl.module.paste.PasteModule
+import sibyl.module.reminders.RemindersModule
 import sibyl.test.TestModule
 import java.io.File
 
@@ -29,6 +30,7 @@ private val client = HttpClient(OkHttp) {
 }
 val messageProcessor = MessageProcessor().apply {
     addModule(LoggingModule())
+    addModule(RemindersModule())
     addModule(PasteModule(HasteService(client)))
     addModule(RoleplayModule())
     addModule(TestModule())
