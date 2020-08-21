@@ -9,8 +9,8 @@ plugins {
 
 val bintrayOrg: String? = System.getenv("BINTRAY_USER")
 val bintrayApiKey: String? = System.getenv("BINTRAY_API_KEY")
-val bintrayRepository = "github"
-var bintrayPackage = "sibyl"
+var bintrayRepository = "github"
+val bintrayPackage = "sibyl"
 //val vcs = "https://github.com/NikkyAI/Sibyl"
 //val issues = "$vcs/issues"
 
@@ -60,7 +60,7 @@ val versionStr: String = if (isSnapshot && describeAbbrevTags.startsWith("v")) {
     var (major, minor, patch) = lastVersion.split('.').map { it.toInt() }
     patch++
     val nextVersion = "$major.$minor.$patch"
-    bintrayPackage = "sibyl-dev"
+    bintrayRepository = "snapshot"
 
     "$nextVersion-dev+$describeTagsAlways"
 } else {
