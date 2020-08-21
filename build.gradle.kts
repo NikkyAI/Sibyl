@@ -62,8 +62,8 @@ val versionStr: String = if (isSnapshot && describeAbbrevTags.startsWith("v")) {
     val nextVersion = "$major.$minor.$patch"
     bintrayRepository = "snapshot"
 
-//    "$nextVersion-dev+$describeTagsAlways"
-    "$nextVersion-SNAPSHOT"
+//    "$nextVersion-SNAPSHOT"
+    "$nextVersion-dev+$describeTagsAlways"
 } else {
     describeAbbrevTags.substringAfter('v')
 }

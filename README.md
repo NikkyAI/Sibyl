@@ -11,25 +11,24 @@ modular matterbridge bot framework
 THe chatbot is equally accessible on all chat platforms supported by [matterbridge](https://github.com/42wim/matterbridge)  
 users from all platforms can use the bot the same way. There is no special features forcing users to switch platforms introduced.
 
-Features (Modules) are designed to be written modularly with only the minumum depednency of core
+Features (Modules) are designed to be written modularly with only the minimal dependency of core
 which also provides basic functionality like parsing configs, providing a database connection and more generic utilities
 
 All messages transformations happens though Interceptors registered on the incoming and outgoing pipelines  
 Interceptors are (simplified): `(T) -> T?` transformation functions that can modify or consume the message as it passes through them  
-Interceptors are registered along with stages, all intercepts or a stage are processed before the next stage is processed  
+Interceptors are registered along with stages, all interceptors on a stage are processed before the next stage is processed  
 All Modules can register their interceptors at any level
 
-Commands are written using https://ajalt.github.io/clikt
-The Core Module processes command parsing and invocation
+Commands are written using https://ajalt.github.io/clikt  
+The Core Module processes command parsing and invocation  
 Modules can register any number of top level and subcommands
 
 Modules can check for the existence of modules they depend on
 and possibly register the dependencies or skip loading (TODO: implement that)
 
 Live Reloading or disabling modules after being enabled is not planned, simplifying the design  
-if you need to change modules just restart
+if you need to change modules just restart  
 the matterbridge will keep running and provide missed backlog to the bot
-
 
 ### Usage
 
