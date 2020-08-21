@@ -26,7 +26,7 @@ class RemindersModule() : SibylModule("reminders") {
         RemindCommand(this)
     )
 
-    internal lateinit var dataSource: HikariDataSource
+    private lateinit var dataSource: HikariDataSource
 
     override fun MessageProcessor.setup() {
         dataSource = Database.dataSourceForSchema(schema = "sibyl-reminders")
@@ -35,20 +35,18 @@ class RemindersModule() : SibylModule("reminders") {
         logger.info { "loaded data source" }
     }
 
-
     val reminders by lazy {
-        val timestampWriteFormat = ISODateTimeFormat.dateTimeNoMillis() // DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
-        val timestampReadFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
         val timestampAdapter = object : ColumnAdapter<LocalDateTime, String> {
+            val timestampWriteFormat = ISODateTimeFormat.dateTimeNoMillis() // DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+            val timestampReadFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
             override fun decode(databaseValue: String) = LocalDateTime.parse(databaseValue, timestampReadFormat)
             override fun encode(value: LocalDateTime) = value.toString(timestampWriteFormat)
         }
 
         val dataSource = Database.dataSourceForSchema("sibyl-reminders")
-        val driver: SqlDriver = dataSource.asJdbcDriver()
 
         RemindersDatabase(
-            driver = driver,
+            driver = dataSource.asJdbcDriver(),
             remindersAdapter = Reminders.Adapter(
                 targetAdapter = timestampAdapter,
                 requestedAtAdapter = timestampAdapter,

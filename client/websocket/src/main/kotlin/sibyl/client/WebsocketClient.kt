@@ -26,8 +26,7 @@ object WebsocketClient {
         client: HttpClient,
         host: String,
         port: Int,
-        token: String? = null,
-        skipBefore: DateTime? = null
+        token: String? = null
     ): Pair<SendChannel<ApiMessage>, Flow<ApiMessage>> = withContext(CoroutineName("startClient")) {
         val sendMessages: Channel<ApiMessage> = Channel(capacity = Channel.CONFLATED)
 //        val receivedMessages: Channel<ApiMessage> = Channel(capacity = Channel.CONFLATED)
@@ -46,9 +45,9 @@ object WebsocketClient {
                         if (token != null) {
                             header("Authorization", "Bearer $token")
                         }
-                        if(skipBefore != null) {
-                            header("skip_before", skipBefore.toString())
-                        }
+//                        if(skipBefore != null) {
+//                            header("skip_before", skipBefore.toString())
+//                        }
                     }
                 ) {
                     receiveFlow = incoming

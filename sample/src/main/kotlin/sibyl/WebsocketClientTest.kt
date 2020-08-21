@@ -7,6 +7,7 @@ import kotlinx.coroutines.*
 import mu.KotlinLogging
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
+import sibyl.api.ApiMessage
 import sibyl.client.WebsocketClient
 import java.util.*
 
@@ -35,7 +36,15 @@ object WebsocketClientTest {
             val (send, receive) = WebsocketClient.connectWebsocket(
                 client, "localhost", 4242,
                 token = "mytoken",
-                skipBefore = DateTime.now()
+//                skipBefore = null // DateTime.now()
+            )
+            send.send(
+                ApiMessage(
+                    username = "test",
+                    text = "connected",
+                    gateway = "matterbridgetest",
+                    channel = "api"
+                )
             )
 
             logger.info { "client started" }

@@ -1,21 +1,17 @@
 package sibyl.module.logging
 
-import kotlinx.coroutines.future.await
+import com.squareup.sqldelight.ColumnAdapter
+import com.squareup.sqldelight.sqlite.driver.asJdbcDriver
 import mu.KotlinLogging
-import org.joda.time.DateTime
+import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
+import org.joda.time.format.ISODateTimeFormat
 import sibyl.*
 import sibyl.api.ApiMessage
 import sibyl.config.ConfigUtil
-import sibyl.db.Database
-import sibyl.db.JOOQBuilder
-import sibyl.db.runOperation
-import sibyl.db.runTransaction
-import sibyl.sibyl_logging.db.generated.Tables
-import sibyl.sibyl_logging.db.generated.tables.records.LogsRecord
+import sibyl.db.*
 import java.io.File
-import java.sql.Timestamp
 import javax.sql.DataSource
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -23,8 +19,8 @@ import kotlin.contracts.contract
 
 class LoggingModule(
     internal val dtFormat: DateTimeFormatter = DateTimeFormat.forPattern(defaultConfig.dateFormat ?: "yyyy-MM-dd HH:mm:ss"),
-    internal val messageFormat: (LogsRecord, DateTimeFormatter) -> String = { logsRecord, dtf ->
-        val prefix = "${DateTime(logsRecord.timestamp.toInstant().toEpochMilli()).toString(dtf)} <${logsRecord.username} ${logsRecord.userid}> "
+    internal val messageFormat: (Logs, DateTimeFormatter) -> String = { logsRecord, dtf ->
+        val prefix = "${logsRecord.timestamp.toString(dtf)} <${logsRecord.username} ${logsRecord.userid}> "
         prefix + logsRecord.text.withIndent("", " ".repeat(prefix.length))
     }
 ) : SibylModule("log", "logs messages and allows you to retrieve them") {
@@ -61,6 +57,25 @@ class LoggingModule(
         logsFolder.mkdirs()
     }
 
+
+    val logsDB by lazy {
+        val timestampAdapter = object : ColumnAdapter<LocalDateTime, String> {
+            val timestampWriteFormat = ISODateTimeFormat.dateTimeNoMillis()
+            val timestampReadFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+            override fun decode(databaseValue: String) = LocalDateTime.parse(databaseValue, timestampReadFormat)
+            override fun encode(value: LocalDateTime) = value.toString(timestampWriteFormat)
+        }
+
+        val dataSource = Database.dataSourceForSchema("sibyl-logging")
+
+        LoggingDatabase(
+            driver = dataSource.asJdbcDriver(),
+            logsAdapter = Logs.Adapter(
+                timestampAdapter = timestampAdapter,
+            )
+        )
+    }
+
     suspend fun processRequest(message: ApiMessage, stage: Stage): ApiMessage {
 //        val logFile = logsFolder.resolve(message.gateway + ".log")
         appendLog(message = message, incoming = true)
@@ -89,46 +104,28 @@ class LoggingModule(
             logger.debug { "blank message is ignored" }
             return
         }
-        dataSource.runTransaction { context ->
-            context
-                .insertInto(
-                    Tables.LOGS,
-                    Tables.LOGS.GATEWAY,
-                    Tables.LOGS.TIMESTAMP,
-                    Tables.LOGS.USERNAME,
-                    Tables.LOGS.USERID,
-                    Tables.LOGS.TEXT,
-                    Tables.LOGS.EVENT,
-                    Tables.LOGS.PROTOCOL,
-                    Tables.LOGS.INCOMING
-                )
-                .values(
-                    message.gateway,
-                    Timestamp(message.timestamp.millis),
-                    message.username,
-                    message.userid,
-                    message.text,
-                    message.event.takeIf { it.isNotBlank() },
-                    message.protocol,
-                    incoming
-                )
-                .returning()
-                .fetchOne()
-        }
+        val maxId = logsDB.logsQueries.selectMaxId().executeAsOneOrNull() ?: 0
+        logsDB.logsQueries.insert(
+            Logs(
+                id = maxId + 1,
+                gateway = message.gateway,
+                timestamp = LocalDateTime(message.timestamp.millis),
+                username = message.username,
+                userid = message.userid,
+                text = message.text,
+                event = message.event.takeIf { it.isNotBlank() },
+                protocol = message.protocol.takeIf { it.isNotBlank() },
+                incoming = if(incoming) 1 else 0
+            )
+        )
     }
 
-    suspend fun getLogs(gateway: String, amount: Int, skipCommands: Boolean): List<LogsRecord> {
-        val messages = dataSource.runOperation { context ->
-            JOOQBuilder(context, Tables.LOGS)
-                .where(Tables.LOGS.GATEWAY.equal(gateway))
-                .applyIf(skipCommands) {
-                    where(Tables.LOGS.TEXT.startsWith("!").not())
-                }
-                .select()
-                .orderBy(Tables.LOGS.TIMESTAMP.desc())
-                .limit(amount)
-                .fetchAsync()
-        }.await().filterNotNull().reversed()
+    suspend fun getLogs(gateway: String, amount: Int, skipCommands: Boolean): List<Logs> {
+        val messages = logsDB.logsQueries.getLogsForGateway(
+            gateway = gateway,
+            skipCommands = if(skipCommands) 1 else 0,
+            amount = amount.toLong()
+        ).executeAsList().reversed()
         return messages
     }
 }

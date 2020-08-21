@@ -3,12 +3,14 @@ package sibyl
 import RoleplayModule
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
+import io.ktor.client.features.websocket.*
 import kotlinx.coroutines.DEBUG_PROPERTY_NAME
 import kotlinx.coroutines.DEBUG_PROPERTY_VALUE_ON
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import sibyl.client.PollingClient
+import sibyl.client.WebsocketClient
 import sibyl.config.ConfigUtil
 import sibyl.haste.HasteService
 import sibyl.module.logging.LoggingModule
@@ -26,7 +28,7 @@ val jsonSerializerCompact = Json {
     encodeDefaults = false
 }
 private val client = HttpClient(OkHttp) {
-//        install(WebSockets)
+    install(WebSockets)
 }
 val messageProcessor = MessageProcessor().apply {
     addModule(LoggingModule())
@@ -41,7 +43,7 @@ fun main(args: Array<String>) {
     System.setProperty(DEBUG_PROPERTY_NAME, DEBUG_PROPERTY_VALUE_ON)
     System.setProperty("org.jooq.no-logo", "true")
 
-    val connectData = ConfigUtil.load(
+    val sampleConfig = ConfigUtil.load(
         file = File("sample.json"),
         serializer = SampleConfig.serializer()
     ) {
@@ -54,12 +56,22 @@ fun main(args: Array<String>) {
 
     runBlocking {
         // TODO: drop all history on first connect
-        val (send, receive) = PollingClient.connectPolling(
-            client,
-            host = connectData.host,
-            port = connectData.port,
-            token = connectData.token
-        )
+        val (send, receive) = if(sampleConfig.useWebsocket) {
+            WebsocketClient.connectWebsocket(
+                client,
+                host = sampleConfig.host,
+                port = sampleConfig.port,
+                token = sampleConfig.token
+            )
+        } else {
+            PollingClient.connectPolling(
+                client,
+                host = sampleConfig.host,
+                port = sampleConfig.port,
+                token = sampleConfig.token
+            )
+        }
+
 
         logger.info { "client started" }
         messageProcessor.start(send = send, receive = receive)

@@ -21,6 +21,7 @@ insert:
     INSERT INTO reminders VALUES ?
 ;
 
+-- remove ugly hack when SERIAL works
 selectMaxId:
     SELECT id
     FROM reminders

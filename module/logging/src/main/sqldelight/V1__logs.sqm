@@ -1,0 +1,15 @@
+import org.joda.time.LocalDateTime;
+
+CREATE TABLE logs (
+    id        SERIAL    NOT NULL
+        PRIMARY KEY,
+    gateway   TEXT      NOT NULL,
+    timestamp TIMESTAMP AS LocalDateTime
+        NOT NULL,
+    username  TEXT      NOT NULL,
+    userid    TEXT      NOT NULL,
+    text      TEXT      NOT NULL,
+    incoming  SMALLINT  NOT NULL,
+    event     TEXT,
+    protocol  TEXT
+);

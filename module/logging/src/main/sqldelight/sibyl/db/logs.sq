@@ -1,0 +1,29 @@
+insert:
+    INSERT INTO logs VALUES ?
+;
+
+getLogsForGateway:
+    SELECT * FROM logs
+        WHERE gateway = :gateway
+            AND ((:skipCommands > 0) OR text NOT LIKE '!%')
+        ORDER BY timestamp DESC
+        LIMIT :amount
+;
+
+-- OFFSET does not work yet
+-- getLogsForGatewayV2:
+--     SELECT * FROM logs
+--         WHERE gateway = :gateway AND ((:skipCommands > 0) OR text NOT LIKE '!%')
+--         ORDER BY timestamp ASC
+--         OFFSET (SELECT COUNT(*) FROM logs
+--             WHERE gateway = :gateway AND ((:skipCommands > 0) OR text NOT LIKE '!%')
+--       ) - :amount
+-- ;
+
+-- remove ugly hack when SERIAL works
+selectMaxId:
+    SELECT id
+    FROM logs
+    ORDER BY id DESC
+    LIMIT 1
+;

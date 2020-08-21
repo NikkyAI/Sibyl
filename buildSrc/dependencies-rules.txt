@@ -1,9 +1,6 @@
 ch.qos.logback:logback-classic
                ^^^^^^^^^^^^^^^
 
-org.jooq:jooq(-*)
-         ^^^^
-
 org.postgresql:postgresql
     ^^^^^^^^^^
 

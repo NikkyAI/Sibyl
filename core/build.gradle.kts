@@ -1,7 +1,8 @@
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
-    id("org.flywaydb.flyway")
+//    id("com.squareup.sqldelight")
+//    id("org.flywaydb.flyway")
     `maven-publish`
 }
 
@@ -16,7 +17,6 @@ dependencies {
 
     api("joda-time:joda-time:_")
 
-    api("org.jooq:jooq:_")
     api("org.flywaydb:flyway-core:_")
     api("com.zaxxer:HikariCP:_")
 

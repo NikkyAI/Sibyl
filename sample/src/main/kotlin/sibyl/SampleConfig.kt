@@ -8,6 +8,7 @@ import sibyl.config.WithSchema
 data class SampleConfig(
     val host: String,
     val token: String? = null,
+    val useWebsocket: Boolean = true,
     @JsonSchema.IntRange(0, 65535)
     val port: Int = 4242
 ) : WithSchema {
