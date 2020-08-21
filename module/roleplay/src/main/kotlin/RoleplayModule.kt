@@ -19,7 +19,7 @@ class RoleplayModule : SibylModule("roleplay", "throw dice and other things, onl
 
     private val diceRegex = "\\b(\\d+)d(\\d+)(?:([v><])(\\d+))?(( )?[+-]\\d+)?\\b".toRegex()
 
-    override fun MessageProcessor.setup() {
+    override fun MessageProcessor.install() {
         registerIncomingInterceptor(Stage.POST_COMMAND, ::processDiceRolls)
     }
 

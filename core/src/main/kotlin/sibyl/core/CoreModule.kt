@@ -29,7 +29,7 @@ class CoreModule : SibylModule("core", "core framework functionality") {
         )
     }
 
-    override fun MessageProcessor.setup() {
+    override fun MessageProcessor.install() {
         registerIncomingInterceptor(Stage.FILTER, ::filterIncoming)
         registerOutgoingInterceptor(Stage.PRE_FILTER, ::fixResponses)
         registerIncomingInterceptor(Stage.COMMANDS, ::processCommands)

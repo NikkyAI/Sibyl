@@ -62,7 +62,8 @@ val versionStr: String = if (isSnapshot && describeAbbrevTags.startsWith("v")) {
     val nextVersion = "$major.$minor.$patch"
     bintrayRepository = "snapshot"
 
-    "$nextVersion-dev+$describeTagsAlways"
+//    "$nextVersion-dev+$describeTagsAlways"
+    "$nextVersion-SNAPSHOT"
 } else {
     describeAbbrevTags.substringAfter('v')
 }
@@ -85,7 +86,7 @@ subprojects {
     project.version = versionStr
 
     plugins.withId("maven-publish") {
-        val artifactId = project.path.drop(1).replace(':', '-') // TODO: try . separator again
+        val artifactId = project.path.drop(1).replace(':', '-')
         val publicationName = "sibyl"
 
         val sourcesJar by tasks.creating(Jar::class) {

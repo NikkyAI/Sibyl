@@ -28,7 +28,7 @@ class RemindersModule() : SibylModule("reminders") {
 
     private lateinit var dataSource: HikariDataSource
 
-    override fun MessageProcessor.setup() {
+    override fun MessageProcessor.install() {
         dataSource = Database.dataSourceForSchema(schema = "sibyl-reminders")
         Database.flywayMigrate(dataSource)
         Database.flywayValidate(dataSource)

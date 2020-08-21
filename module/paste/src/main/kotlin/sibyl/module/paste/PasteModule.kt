@@ -11,7 +11,7 @@ class PasteModule(
     private val pasteService: PasteService,
     private val maxLines: Int = 2
 ) : SibylModule("pastee") {
-    override fun MessageProcessor.setup() {
+    override fun MessageProcessor.install() {
         require(messageProcessor.hasModule(CoreModule::class)) { "core module is not installed" }
 
         registerOutgoingInterceptor(Stage.FILTER, interceptor = ::shortenOutgoing)

@@ -29,11 +29,11 @@ abstract class SibylModule(
         this.sendResponse = sendResponse
         this.messageProcessor = messageProcessor
         with(messageProcessor) {
-            setup()
+            install()
         }
     }
 
-    open fun MessageProcessor.setup() {
+    open fun MessageProcessor.install() {
 
     }
     open suspend fun start() {

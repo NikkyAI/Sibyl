@@ -43,7 +43,7 @@ class LoggingModule(
 
     private lateinit var dataSource: DataSource
 
-    override fun MessageProcessor.setup() {
+    override fun MessageProcessor.install() {
         registerIncomingInterceptor(Stage.POST_FILTER, ::processRequest)
         registerOutgoingInterceptor(LOGGING_OUTGOING, ::processResponse)
 

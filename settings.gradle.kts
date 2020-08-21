@@ -1,4 +1,5 @@
-import de.fayard.dependencies.bootstrapRefreshVersionsAndDependencies
+import de.fayard.refreshVersions.bootstrapRefreshVersions
+
 pluginManagement {
     repositories {
         google()
@@ -6,22 +7,15 @@ pluginManagement {
         maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
         gradlePluginPortal()
     }
-    resolutionStrategy {
-        eachPlugin {
-            when(requested.id.id) {
-//                "com.squareup.sqldelight" -> useModule("com.squareup.sqldelight:gradle-plugin:1.4.0")
-            }
-        }
-    }
 }
 buildscript {
     repositories {
         gradlePluginPortal()
     }
-    dependencies.classpath("de.fayard:dependencies:0.5.8")
+    dependencies.classpath("de.fayard.refreshVersions:refreshVersions:0.9.5")
 }
 
-bootstrapRefreshVersionsAndDependencies(
+bootstrapRefreshVersions(
     listOf(rootDir.resolve("buildSrc/dependencies-rules.txt").readText())
 )
 
