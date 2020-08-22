@@ -46,7 +46,7 @@ jobs:
 #      - name: 'Publish Plugin to BinTray'
 #        uses: eskatos/gradle-command-action@v1
 #        with:
-#          arguments: 'publishPluginMavenPublicationToBintrayRepository publishSibylBasePluginMarkerMavenPublicationToBintrayRepository publishSibylDatabasePluginMarkerMavenPublicationToBintrayRepository -Ppublish=1 -Poverride=0 --stacktrace'
+#          arguments: 'publishSibylMavenPublicationToBintrayRepository publishSibylBasePluginMarkerMavenPublicationToBintrayRepository publishSibylDatabasePluginMarkerMavenPublicationToBintrayRepository -Ppublish=1 -Poverride=0 --stacktrace'
 #          build-root-directory: 'plugin'
 #        env:
 #          BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}

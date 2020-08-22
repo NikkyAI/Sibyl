@@ -17,8 +17,7 @@ open class SibylDatabasePlugin : Plugin<Project> {
     companion object {
         fun Project.setupDatabase() {
             // add base plugin
-//            apply(plugin = "moe.nikky.sibyl")
-            apply<SibylBasePlugin>() // add this by type since no plugin marker is published
+            apply<SibylBasePlugin>()
 
             apply(plugin = "com.squareup.sqldelight")
             apply(plugin = "org.flywaydb.flyway")

@@ -14,4 +14,12 @@ bootstrapRefreshVersions(
 
 rootProject.name = "plugin"
 
-//include("database")
+fun includeAndRename(path: String) {
+    include(path)
+    project(path).name = "plugin-" + path.drop(1).replace(':', '-')
+}
+
+
+includeAndRename(":base")
+includeAndRename(":database")
+//include("test")
