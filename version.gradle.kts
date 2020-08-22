@@ -27,14 +27,14 @@ val describeTags = captureExec {
     commandLine("git", "describe", "--tags")
 }?.trim() ?: "v0.0.0"
 
-val describeAbbrevAlways = captureExec {
+val currentHash = captureExec {
     commandLine("git", "describe", "--abbrev=0", "--always")
 }?.trim() ?: "v0.0.0"
 
 logger.lifecycle("describeTagsAlways: '$currentTagOrHash'")
 logger.lifecycle("tag: '$currentOrLastTag'")
 logger.lifecycle("tag2: '$describeTags'")
-logger.lifecycle("commit-hash: '$describeAbbrevAlways'")
+logger.lifecycle("commit-hash: '$currentHash'")
 
 val currentIsATag = currentTagOrHash != currentOrLastTag
 val isSnapshot = currentIsATag && currentOrLastTag.startsWith("v")

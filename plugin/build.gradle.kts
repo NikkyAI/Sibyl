@@ -24,11 +24,11 @@ dependencies {
 gradlePlugin {
     plugins {
         create("sibylBase") {
-            id = "moe.nikky.sibyl"
+            id = "moe.nikky.sibyl.plugin.base"
             implementationClass = "sibyl.SibylBasePlugin"
         }
         create("sibylDatabase") {
-            id = "moe.nikky.sibyl.database"
+            id = "moe.nikky.sibyl.plugin.database"
             implementationClass = "sibyl.db.SibylDatabasePlugin"
         }
     }
@@ -51,7 +51,7 @@ if(isSnapshot) {
     bintrayRepository = "snapshot"
 }
 
-val pomArtifactId = project.properties["POM_ARTIFACT_ID"] as? String ?: "sibyl-plugin" // project.path.drop(1).replace(':', '-')
+//val artifactId = "plugin" // project.path.drop(1).replace(':', '-')
 val publicationName = "sibylPlugin"
 val sourcesJar by tasks.creating(Jar::class) {
     dependsOn(JavaPlugin.CLASSES_TASK_NAME)
@@ -70,7 +70,7 @@ configure<PublishingExtension> {
             from(components["kotlin"])
             artifact(sourcesJar)
             artifact(javadocJar)
-            this.artifactId = "sibyl-plugin"
+            this.artifactId = "plugin"
         }
     }
 //    repositories {
