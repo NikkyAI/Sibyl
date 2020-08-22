@@ -33,7 +33,7 @@ subprojects {
 
     plugins.withId("maven-publish") {
         val artifactId = project.path.drop(1).replace(':', '-')
-        val publicationName = "sibyl"
+        val publicationName = "default"
 
         val sourcesJar by tasks.creating(Jar::class) {
             dependsOn(JavaPlugin.CLASSES_TASK_NAME)
@@ -62,6 +62,8 @@ subprojects {
 //                if (bintrayOrg != null && bintrayApiKey != null) {
                 val publish= properties["publish"] as? String ?: "0"
                 val override= properties["override"] as? String ?: "0"
+                val fileTargetPath = artifactId
+                val versionName = project.version as String
                 maven(url = "https://api.bintray.com/maven/$bintrayOrg/$bintrayRepository/$bintrayPackage/;publish=$publish;override=$override") {
                     name = "bintray"
                     credentials {
@@ -72,6 +74,7 @@ subprojects {
 //                }
             }
         }
+        apply(from="${rootDir.path}/pom.gradle.kts")
 //        if (bintrayOrg == null || bintrayApiKey == null) {
 //            logger.error("bintray credentials not configured properly")
 //            return@withId
