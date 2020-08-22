@@ -1,9 +1,8 @@
 plugins {
     kotlin("jvm") apply false
     kotlin("plugin.serialization") apply false
-    id("com.jfrog.bintray") apply false
     id("org.flywaydb.flyway") apply false
-    id("com.squareup.sqldelight") /*version "1.5.0-SNAPSHOT"*/ apply false
+    id("com.squareup.sqldelight") apply false
     id("com.vanniktech.dependency.graph.generator")
 }
 
@@ -59,40 +58,53 @@ subprojects {
                     this.artifactId = artifactId
                 }
             }
-        }
-        if (bintrayOrg == null || bintrayApiKey == null) {
-            logger.error("bintray credentials not configured properly")
-            return@withId
-        }
-        project.apply(plugin = "com.jfrog.bintray")
-        configure<com.jfrog.bintray.gradle.BintrayExtension> {
-            user = bintrayOrg
-            key = bintrayApiKey
-            publish = true
-            override = false
-            dryRun = !properties.containsKey("nodryrun")
-            setPublications(publicationName)
-            pkg(delegateClosureOf<com.jfrog.bintray.gradle.BintrayExtension.PackageConfig> {
-                repo = bintrayRepository
-                name = bintrayPackage
-                userOrg = bintrayOrg
-                version = VersionConfig().apply {
-                    // do not put commit hashes in vcs tag
-                    if (!isSnapshot) {
-                        vcsTag = extra["vcsTag"] as String
+            repositories {
+//                if (bintrayOrg != null && bintrayApiKey != null) {
+                val publish= properties["publish"] as? String ?: "0"
+                val override= properties["override"] as? String ?: "0"
+                maven(url = "https://api.bintray.com/maven/$bintrayOrg/$bintrayRepository/$bintrayPackage/;publish=$publish;override=$override") {
+                    name = "bintray"
+                    credentials {
+                        username = bintrayOrg
+                        password = bintrayApiKey
                     }
-//                    vcsTag = describeAbbrevAlwaysTags
-                    name = project.version as String
-                    githubReleaseNotesFile = "RELEASE_NOTES.md"
                 }
-//                description = rootProject.description
-//                websiteUrl = "https://...."
-//                vcsUrl = vcs
-//                setLabels("kotlin", "matterbridge", "chatbot")
-//                setLicenses("MIT")
-//                issueTrackerUrl = issues
-            })
+//                }
+            }
         }
+//        if (bintrayOrg == null || bintrayApiKey == null) {
+//            logger.error("bintray credentials not configured properly")
+//            return@withId
+//        }
+//        project.apply(plugin = "com.jfrog.bintray")
+//        configure<com.jfrog.bintray.gradle.BintrayExtension> {
+//            user = bintrayOrg
+//            key = bintrayApiKey
+//            publish = true
+//            override = false
+//            dryRun = !properties.containsKey("nodryrun")
+//            setPublications(publicationName)
+//            pkg(delegateClosureOf<com.jfrog.bintray.gradle.BintrayExtension.PackageConfig> {
+//                repo = bintrayRepository
+//                name = bintrayPackage
+//                userOrg = bintrayOrg
+//                version = VersionConfig().apply {
+//                    // do not put commit hashes in vcs tag
+//                    if (!isSnapshot) {
+//                        vcsTag = extra["vcsTag"] as String
+//                    }
+////                    vcsTag = describeAbbrevAlwaysTags
+//                    name = project.version as String
+//                    githubReleaseNotesFile = "RELEASE_NOTES.md"
+//                }
+////                description = rootProject.description
+////                websiteUrl = "https://...."
+////                vcsUrl = vcs
+////                setLabels("kotlin", "matterbridge", "chatbot")
+////                setLicenses("MIT")
+////                issueTrackerUrl = issues
+//            })
+//        }
     }
 
 //    afterEvaluate {
@@ -233,5 +245,3 @@ tasks {
         }
     }
 }
-
-// TODO: add bintray publishing

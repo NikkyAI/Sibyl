@@ -51,7 +51,7 @@ if(isSnapshot) {
     bintrayRepository = "snapshot"
 }
 
-val artifactId = project.properties["POM_ARTIFACT_ID"] ?: "plugin" // project.path.drop(1).replace(':', '-')
+val pomArtifactId = project.properties["POM_ARTIFACT_ID"] as? String ?: "sibyl-plugin" // project.path.drop(1).replace(':', '-')
 val publicationName = "sibylPlugin"
 val sourcesJar by tasks.creating(Jar::class) {
     dependsOn(JavaPlugin.CLASSES_TASK_NAME)
@@ -70,19 +70,46 @@ configure<PublishingExtension> {
             from(components["kotlin"])
             artifact(sourcesJar)
             artifact(javadocJar)
-            this.artifactId = artifactId
+//            this.artifactId = "sibyl-plugin"
+
+//            pom {
+//                groupId = findProperty("GROUP") as String?
+//                artifactId = findProperty("POM_ARTIFACT_ID") as String?
+//                version = findProperty("VERSION_NAME") as String?
+//                name.set(findProperty("POM_NAME") as String?)
+//                packaging = findProperty("POM_PACKAGING") as String?
+//                description.set(findProperty("POM_DESCRIPTION") as String?)
+//                url.set(findProperty("POM_URL") as String?)
+//                scm {
+//                    url.set(findProperty("POM_SCM_URL") as String?)
+//                    connection.set(findProperty("POM_SCM_CONNECTION") as String?)
+//                    developerConnection.set(findProperty("POM_SCM_DEV_CONNECTION") as String?)
+//                }
+//                licenses {
+//                    name.set(findProperty("POM_LICENCE_NAME") as String?)
+//                    url.set(findProperty("POM_LICENCE_URL") as String?)
+//                }
+//                developers {
+//                    developer {
+//                        id.set(findProperty("POM_DEVELOPER_ID") as String?)
+//                        name.set(findProperty("POM_DEVELOPER_NAME") as String?)
+//                    }
+//                }
+//            }
         }
     }
     repositories {
-        if (bintrayOrg != null && bintrayApiKey != null) {
-            maven(url = "https://api.bintray.com/maven/$bintrayRepository/$bintrayPackage/$artifactId/;publish=0;override=0") {
-                name = "bintray"
-                credentials {
-                    username = bintrayOrg
-                    password = bintrayApiKey
-                }
+//        if (bintrayOrg != null && bintrayApiKey != null) {
+        val publish= properties["publish"] as? String ?: "0"
+        val override= properties["override"] as? String ?: "0"
+        maven(url = "https://api.bintray.com/maven/$bintrayOrg/$bintrayRepository/$bintrayPackage/$pomArtifactId/;publish=$publish;override=$override") {
+            name = "bintray"
+            credentials {
+                username = bintrayOrg
+                password = bintrayApiKey
             }
         }
+//        }
     }
 }
 //if (bintrayOrg == null || bintrayApiKey == null) {

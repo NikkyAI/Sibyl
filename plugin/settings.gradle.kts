@@ -20,6 +20,6 @@ bootstrapRefreshVersions(
     rootDir.parentFile.resolve("versions.properties")
 )
 
-rootProject.name = "plugin"
+rootProject.name = "sibyl-plugin"
 
 //include("database")
