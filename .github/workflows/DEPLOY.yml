@@ -30,12 +30,24 @@ jobs:
       - name: 'Publish Plugin to BinTray'
         uses: eskatos/gradle-command-action@v1
         with:
-          arguments: 'bintrayUpload -Pnodryrun --stacktrace'
+          arguments: 'publishSibylPluginPublicationToBintrayRepository -Pnodryrun --stacktrace'
           build-root-directory: 'plugin'
         #        if: startsWith(github.ref, 'refs/tags/')
         env:
           BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
           BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+
+      - name: 'Publish Plugin Markers to BinTray'
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: 'publishSibylDatabasePluginMarkerMavenPublicationToBintrayRepository -Pnodryrun -PPOM_ARTIFACT_ID=moe.nikky.sibyl.database.gradle.plugin --stacktrace'
+          build-root-directory: 'plugin'
+        #        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+          BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+
+          -PPOM_ARTIFACT_ID=com.apollographql.apollo.gradle.plugin:
 
 env:
   GRADLE_OPTS: -Dorg.gradle.configureondemand=true -Dorg.gradle.parallel=false -Dkotlin.incremental=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"

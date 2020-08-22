@@ -1,5 +1,5 @@
 plugins {
-    id("com.jfrog.bintray") apply false
+//    id("com.jfrog.bintray") apply false
     `kotlin-dsl`
     `java-gradle-plugin`
     `maven-publish`
@@ -51,7 +51,7 @@ if(isSnapshot) {
     bintrayRepository = "snapshot"
 }
 
-val artifactId = project.path.drop(1).replace(':', '-')
+val artifactId = project.properties["POM_ARTIFACT_ID"] ?: "plugin" // project.path.drop(1).replace(':', '-')
 val publicationName = "sibylPlugin"
 val sourcesJar by tasks.creating(Jar::class) {
     dependsOn(JavaPlugin.CLASSES_TASK_NAME)
@@ -73,36 +73,43 @@ configure<PublishingExtension> {
             this.artifactId = artifactId
         }
     }
-}
-if (bintrayOrg == null || bintrayApiKey == null) {
-    logger.error("bintray credentials not configured properly")
-} else {
-    project.apply(plugin = "com.jfrog.bintray")
-    configure<com.jfrog.bintray.gradle.BintrayExtension> {
-        user = bintrayOrg
-        key = bintrayApiKey
-        publish = true
-        override = false
-        dryRun = !properties.containsKey("nodryrun")
-//        dryRun = true // TODO: disable on github actions
-        setPublications(publicationName)
-        pkg(delegateClosureOf<com.jfrog.bintray.gradle.BintrayExtension.PackageConfig> {
-            repo = bintrayRepository
-            name = bintrayPackage
-            userOrg = bintrayOrg
-            version = VersionConfig().apply {
-                // do not put commit hashes in vcs tag
-                if (!isSnapshot) {
-                    vcsTag = extra["vcsTag"] as String
+    repositories {
+        if (bintrayOrg != null && bintrayApiKey != null) {
+            maven(url = "https://api.bintray.com/maven/$bintrayRepository/$bintrayPackage/$artifactId/;publish=0;override=0") {
+                name = "bintray"
+                credentials {
+                    username = bintrayOrg
+                    password = bintrayApiKey
                 }
-//                vcsTag = describeAbbrevAlwaysTags
-                name = project.version as String
-                githubReleaseNotesFile = "RELEASE_NOTES.md"
             }
-        })
+        }
     }
 }
-
-tasks {
-
-}
+//if (bintrayOrg == null || bintrayApiKey == null) {
+//    logger.error("bintray credentials not configured properly")
+//} else {
+//    project.apply(plugin = "com.jfrog.bintray")
+//    configure<com.jfrog.bintray.gradle.BintrayExtension> {
+//        user = bintrayOrg
+//        key = bintrayApiKey
+//        publish = true
+//        override = false
+//        dryRun = !properties.containsKey("nodryrun")
+////        dryRun = true // TODO: disable on github actions
+//        setPublications(publicationName)
+//        pkg(delegateClosureOf<com.jfrog.bintray.gradle.BintrayExtension.PackageConfig> {
+//            repo = bintrayRepository
+//            name = bintrayPackage
+//            userOrg = bintrayOrg
+//            version = VersionConfig().apply {
+//                // do not put commit hashes in vcs tag
+//                if (!isSnapshot) {
+//                    vcsTag = extra["vcsTag"] as String
+//                }
+////                vcsTag = describeAbbrevAlwaysTags
+//                name = project.version as String
+//                githubReleaseNotesFile = "RELEASE_NOTES.md"
+//            }
+//        })
+//    }
+//}
