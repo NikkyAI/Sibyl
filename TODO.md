@@ -6,12 +6,13 @@
   - [x] setup postgres (pgdata on docker)
   - [x] figure out migrations
   - [ ] figure out migration test data
-- [ ] add errohandling to module installation and interceptor invocation  
+- [ ] add errorhandling to module installation and interceptor invocation  
       log errors and skip modules
 - reminders
   - [x] `!remind in <DURATION> <MESSAGE>`
   - [ ] `!remind at <TIMESTAMP> <MESSAGE>`
 - [ ] leaving messages for offline people
+- [ ] publish buildSrc as plugin, so custom modules can reuse it ?
 - [ ] publish to oss sonatype (look at sqldelight as example)
 - [ ] sibyl-launcher (kotlin-scripting based executable jar)
 

@@ -1,8 +1,7 @@
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
-    id("com.squareup.sqldelight")
-    id("org.flywaydb.flyway")
+    id("moe.nikky.sibyl.database")
     `maven-publish`
 }
 

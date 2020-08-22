@@ -1,7 +1,6 @@
 package sibyl.module.reminders
 
 import com.squareup.sqldelight.ColumnAdapter
-import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.sqlite.driver.asJdbcDriver
 import com.zaxxer.hikari.HikariDataSource
 import kotlinx.coroutines.*
@@ -17,7 +16,7 @@ import sibyl.db.Database
 import sibyl.db.Reminders
 import sibyl.db.RemindersDatabase
 
-class RemindersModule() : SibylModule("reminders") {
+class RemindersModule : SibylModule("reminders") {
     companion object {
         private val logger = KotlinLogging.logger {}
     }

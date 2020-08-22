@@ -17,7 +17,7 @@ dependencies {
 
     api("joda-time:joda-time:_")
 
-    api("org.flywaydb:flyway-core:_")
+    implementation("org.flywaydb:flyway-core:_")
     api("com.zaxxer:HikariCP:_")
 
     api("com.github.ajalt:clikt:_")

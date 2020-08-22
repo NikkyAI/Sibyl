@@ -26,6 +26,7 @@ fun includeAndRename(path: String) {
     project(path).name = path.drop(1).replace(':', '-')
 }
 
+includeBuild("plugin")
 include(":core")
 include(":client:polling")
 include(":client:websocket")
