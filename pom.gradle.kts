@@ -2,6 +2,7 @@ val vcs = "https://github.com/NikkyAI/Sibyl"
 
 configure<PublishingExtension> {
     publications.withType<MavenPublication> {
+        logger.lifecycle("configuring publication '$name'")
         pom {
             name.set(project.name)
             description.set(project.description)

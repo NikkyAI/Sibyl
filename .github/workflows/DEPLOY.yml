@@ -21,7 +21,7 @@ jobs:
       - name: 'Publish to BinTray'
         uses: eskatos/gradle-command-action@v1
         with:
-          arguments: 'publishDefaultPublicationToBintrayRepository -Pnodryrun --stacktrace'
+          arguments: 'bintrayUpload -Pnodryrun --stacktrace'
         env:
           BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
           BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
@@ -29,16 +29,7 @@ jobs:
       - name: 'Publish Plugin to BinTray'
         uses: eskatos/gradle-command-action@v1
         with:
-          arguments: 'publishDefaultPublicationToBintrayRepository -Ppublish=0 --stacktrace'
-          build-root-directory: 'plugin'
-        env:
-          BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
-          BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-
-      - name: 'Publish Plugin Marker to BinTray'
-        uses: eskatos/gradle-command-action@v1
-        with:
-          arguments: 'publishSibylDatabasePluginMarkerMavenPublicationToBintrayRepository -Ppublish=0 -PPOM_ARTIFACT_ID=moe.nikky.sibyl.database.gradle.plugin --stacktrace'
+          arguments: 'bintrayUpload -Pnodryrun --stacktrace'
           build-root-directory: 'plugin'
         env:
           BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
