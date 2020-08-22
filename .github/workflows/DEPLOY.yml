@@ -21,7 +21,7 @@ jobs:
       - name: 'Publish to BinTray'
         uses: eskatos/gradle-command-action@v1
         with:
-          arguments: 'bintrayUpload -Pnodryrun --stacktrace'
+          arguments: 'publish -Ppublish=1 --stacktrace'
         env:
           BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
           BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
@@ -29,11 +29,11 @@ jobs:
       - name: 'Publish Plugin to BinTray'
         uses: eskatos/gradle-command-action@v1
         with:
-          arguments: 'bintrayUpload -Pnodryrun --stacktrace'
+          arguments: 'publish -Ppublish=1 --stacktrace'
           build-root-directory: 'plugin'
         env:
           BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
           BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
 
-env:
-  GRADLE_OPTS: -Dorg.gradle.configureondemand=true -Dorg.gradle.parallel=false -Dkotlin.incremental=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+#env:
+#  GRADLE_OPTS: -Dorg.gradle.configureondemand=true -Dorg.gradle.parallel=false -Dkotlin.incremental=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"

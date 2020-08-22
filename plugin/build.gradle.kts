@@ -73,48 +73,44 @@ configure<PublishingExtension> {
             this.artifactId = "plugin"
         }
     }
-//    repositories {
-////        if (bintrayOrg != null && bintrayApiKey != null) {
-//        val fileTargetPath = pomArtifactId
-//        val versionName = project.version as String
-//        val publish= properties["publish"] as? String ?: "0"
-//        val override= properties["override"] as? String ?: "0"
-//        maven(url = "https://api.bintray.com/maven/$bintrayOrg/$bintrayRepository/$bintrayPackage/;publish=$publish;override=$override") {
-//            name = "bintray"
-//            credentials {
-//                username = bintrayOrg
-//                password = bintrayApiKey
-//            }
-//        }
-////        }
-//    }
+    repositories {
+        val publish= properties["publish"] as? String ?: "0"
+        val override= properties["override"] as? String ?: "0"
+        maven(url = "https://api.bintray.com/maven/$bintrayOrg/$bintrayRepository/$bintrayPackage/;publish=$publish;override=$override") {
+            name = "bintray"
+            credentials {
+                username = bintrayOrg
+                password = bintrayApiKey
+            }
+        }
+    }
     apply(from="${rootDir.parentFile.path}/pom.gradle.kts")
 }
-if (bintrayOrg == null || bintrayApiKey == null) {
-    logger.error("bintray credentials not configured properly")
-} else {
-    project.apply(plugin = "com.jfrog.bintray")
-    configure<com.jfrog.bintray.gradle.BintrayExtension> {
-        user = bintrayOrg
-        key = bintrayApiKey
-        publish = true
-        override = false
-        dryRun = !properties.containsKey("nodryrun")
-//        dryRun = true // TODO: disable on github actions
-        setPublications(publicationName, "sibylBasePluginMarkerMaven", "sibylDatabasePluginMarkerMaven")
-        pkg(delegateClosureOf<com.jfrog.bintray.gradle.BintrayExtension.PackageConfig> {
-            repo = bintrayRepository
-            name = bintrayPackage
-            userOrg = bintrayOrg
-            version = VersionConfig().apply {
-                // do not put commit hashes in vcs tag
-                if (!isSnapshot) {
-                    vcsTag = extra["vcsTag"] as String
-                }
-//                vcsTag = describeAbbrevAlwaysTags
-                name = project.version as String
-                githubReleaseNotesFile = "RELEASE_NOTES.md"
-            }
-        })
-    }
-}
+//if (bintrayOrg == null || bintrayApiKey == null) {
+//    logger.error("bintray credentials not configured properly")
+//} else {
+//    project.apply(plugin = "com.jfrog.bintray")
+//    configure<com.jfrog.bintray.gradle.BintrayExtension> {
+//        user = bintrayOrg
+//        key = bintrayApiKey
+//        publish = true
+//        override = false
+//        dryRun = !properties.containsKey("nodryrun")
+////        dryRun = true // TODO: disable on github actions
+//        setPublications(publicationName, "sibylBasePluginMarkerMaven", "sibylDatabasePluginMarkerMaven")
+//        pkg(delegateClosureOf<com.jfrog.bintray.gradle.BintrayExtension.PackageConfig> {
+//            repo = bintrayRepository
+//            name = bintrayPackage
+//            userOrg = bintrayOrg
+//            version = VersionConfig().apply {
+//                // do not put commit hashes in vcs tag
+//                if (!isSnapshot) {
+//                    vcsTag = extra["vcsTag"] as String
+//                }
+////                vcsTag = describeAbbrevAlwaysTags
+//                name = project.version as String
+//                githubReleaseNotesFile = "RELEASE_NOTES.md"
+//            }
+//        })
+//    }
+//}
