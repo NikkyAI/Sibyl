@@ -42,9 +42,6 @@ val bintrayApiKey: String? = System.getenv("BINTRAY_API_KEY")
 var bintrayRepository = "github"
 val bintrayPackage = "sibyl"
 
-group = "moe.nikky.sibyl"
-description = "modular chatbot framework for matterbridge"
-
 apply(from="${rootDir.parentFile.path}/version.gradle.kts")
 val isSnapshot = extra["isSnapshot"] as Boolean
 if(isSnapshot) {
