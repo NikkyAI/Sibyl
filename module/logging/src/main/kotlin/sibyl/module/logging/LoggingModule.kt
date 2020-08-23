@@ -47,7 +47,7 @@ class LoggingModule(
         registerIncomingInterceptor(Stage.POST_FILTER, ::processRequest)
         registerOutgoingInterceptor(LOGGING_OUTGOING, ::processResponse)
 
-        dataSource = Database.dataSourceForSchema(schema = "sibyl-logging")
+        dataSource = Database.dataSourceForSchema(schema = SCHEMA_NAME_LOGGING)
         Database.flywayMigrate(dataSource)
         Database.flywayValidate(dataSource)
         logger.info { "loaded data source" }

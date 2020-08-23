@@ -54,17 +54,14 @@ class CoreModule : SibylModule("core", "core framework functionality") {
                     delay(100)
                 }
             })
-            runBlocking {
-                sendMessage(
-                    ApiMessage(
-                        gateway = config.controlGateway,
-                        text = "starting up"
-                    ),
-                    stage = null
-                )
-            }
+            sendMessage(
+                ApiMessage(
+                    gateway = config.controlGateway,
+                    text = "starting up"
+                ),
+                stage = null
+            )
         }
-
     }
 
     private suspend fun filterIncoming(message: ApiMessage, stage: Stage): ApiMessage? {
@@ -89,9 +86,11 @@ class CoreModule : SibylModule("core", "core framework functionality") {
 
     suspend fun processCommands(message: ApiMessage, stage: Stage): ApiMessage? {
         val bufferConsole = BufferConsole()
+        var hasCommandPrefix = false
         modules@ for (module in messageProcessor.modules) {
             logger.debug { "processing message $message" }
             if (message.text.startsWith(module.commandPrefix)) {
+                hasCommandPrefix = true
                 logger.debug { "searching for commands in ${module.commands.map { module.commandPrefix + it.commandName }}" }
                 val command = module.commands.find { cmd ->
 //                    val regex = "^\\Q$\\E\\s".toRegex(RegexOption.IGNORE_CASE)
@@ -135,6 +134,11 @@ class CoreModule : SibylModule("core", "core framework functionality") {
             logger.debug { "no command found" }
         }
 
+        if(hasCommandPrefix) {
+            // message looks like a command but is not
+            // TODO: send list ov available commands
+            return null
+        }
         return message
     }
 }

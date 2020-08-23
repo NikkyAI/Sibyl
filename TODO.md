@@ -12,7 +12,13 @@
   - [x] `!remind in <DURATION> <MESSAGE>`
   - [ ] `!remind at <TIMESTAMP> <MESSAGE>`
 - [ ] leaving messages for offline people
-- [ ] publish buildSrc as plugin, so custom modules can reuse it ?
+  - [ ] identifying people across platforms
+    - command based handshake
+    - generating 2 part tokens
+    - sending first token in pairing request
+    - sending second token in pairing accept
+    - verify tokens cryptographically
+- [x] publish build-logic as plugin, so custom modules can reuse it
 - [ ] publish to oss sonatype (look at sqldelight as example)
 - [ ] sibyl-launcher (kotlin-scripting based executable jar)
 

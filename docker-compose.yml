@@ -7,7 +7,7 @@ services:
 #      - "4242:4242"
 #      - "4343:4343"
 #    volumes:
-#      - ./matterbridge:/etc/matterbridge
+#      - ./matterbridge-config:/etc/matterbridge
 ##    entrypoint: ["/bin/matterbridge", "-debug", "-conf", "/etc/matterbridge/matterbridge.toml"]
 #  redis:
 #    container_name: redis
@@ -31,7 +31,7 @@ services:
 #    container_name: sibyl_postgres
     hostname: sibyl_postgres
     restart: unless-stopped
-    image: postgres:11
+    image: postgres:12
     volumes:
       - sibyl_pgdata:/var/lib/postgresql/data
     ports:

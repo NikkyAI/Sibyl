@@ -2,9 +2,27 @@ plugins {
     kotlin("jvm") apply false
     kotlin("plugin.serialization") apply false
     id("org.flywaydb.flyway") apply false
-    id("com.squareup.sqldelight") apply false
+//    id("com.squareup.sqldelight") apply false
     id("com.jfrog.bintray") apply false
-    id("com.vanniktech.dependency.graph.generator")
+//    id("com.vanniktech.dependency.graph.generator")
+}
+
+// Add first-class support for included/composite builds: https://github.com/jmfayard/refreshVersions/issues/205
+val dummy = configurations.create("dummy") {
+    isCanBeConsumed = true
+}
+
+dependencies {
+    add(dummy.name, "com.squareup:kotlinpoet:_")
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven(url = "https://kotlin.bintray.com/ktor")
+        maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
+    }
 }
 
 val bintrayOrg: String? = System.getenv("BINTRAY_USER")
@@ -22,13 +40,6 @@ if(isSnapshot) {
 }
 
 subprojects {
-    repositories {
-        jcenter()
-        mavenCentral()
-        maven(url = "https://kotlin.bintray.com/ktor")
-        maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
-    }
-
     project.group = rootProject.group
     project.version = rootProject.version
 
@@ -101,45 +112,45 @@ subprojects {
     }
 }
 
-dependencyGraphGenerator {
-    generators += com.vanniktech.dependency.graph.generator.DependencyGraphGeneratorExtension.Generator(
-        name = "projects",
-        include = { dep ->
-            logger.lifecycle("include: $dep ${dep.moduleGroup} ${dep.parents}")
-            dep.moduleGroup == rootProject.group || dep.parents.any { it.moduleGroup == rootProject.group }
-        },
-        children = { dep ->
-//            logger.lifecycle("children: $dep ${dep.parents}")
-//            dep.moduleGroup == "Sibyl" || dep.parents.any { it.moduleGroup == "Sibyl" }
-            true
-        },
-        projectNode = { node, b ->
-            node
-//                .setName(b.path.drop(1).replace(':', '-'))
-                .add(
-                    guru.nidi.graphviz.attribute.Color.SLATEGRAY,
-                    guru.nidi.graphviz.attribute.Color.AQUAMARINE.background().fill(),
-                    guru.nidi.graphviz.attribute.Style.FILLED
-                )
-        },
-        includeProject = { project ->
-            logger.lifecycle("project: $project")
-            project.buildFile.exists()
-        },
-        dependencyNode = { node, dep ->
-            logger.lifecycle("dep node $dep ${dep::class}")
-            node
-        }
-    )
-}
-
-tasks {
-    withType(com.vanniktech.dependency.graph.generator.DependencyGraphGeneratorTask::class).all {
-        doFirst {
-            logger.lifecycle("cleaning output")
-            outputDirectory = outputDirectory.resolve(generator.name)
-            outputDirectory.deleteRecursively()
-            outputDirectory.mkdirs()
-        }
-    }
-}
+//dependencyGraphGenerator {
+//    generators += com.vanniktech.dependency.graph.generator.DependencyGraphGeneratorExtension.Generator(
+//        name = "projects",
+//        include = { dep ->
+//            logger.lifecycle("include: $dep ${dep.moduleGroup} ${dep.parents}")
+//            dep.moduleGroup == rootProject.group || dep.parents.any { it.moduleGroup == rootProject.group }
+//        },
+//        children = { dep ->
+////            logger.lifecycle("children: $dep ${dep.parents}")
+////            dep.moduleGroup == "Sibyl" || dep.parents.any { it.moduleGroup == "Sibyl" }
+//            true
+//        },
+//        projectNode = { node, b ->
+//            node
+////                .setName(b.path.drop(1).replace(':', '-'))
+//                .add(
+//                    guru.nidi.graphviz.attribute.Color.SLATEGRAY,
+//                    guru.nidi.graphviz.attribute.Color.AQUAMARINE.background().fill(),
+//                    guru.nidi.graphviz.attribute.Style.FILLED
+//                )
+//        },
+//        includeProject = { project ->
+//            logger.lifecycle("project: $project")
+//            project.buildFile.exists()
+//        },
+//        dependencyNode = { node, dep ->
+//            logger.lifecycle("dep node $dep ${dep::class}")
+//            node
+//        }
+//    )
+//}
+//
+//tasks {
+//    withType(com.vanniktech.dependency.graph.generator.DependencyGraphGeneratorTask::class).all {
+//        doFirst {
+//            logger.lifecycle("cleaning output")
+//            outputDirectory = outputDirectory.resolve(generator.name)
+//            outputDirectory.deleteRecursively()
+//            outputDirectory.mkdirs()
+//        }
+//    }
+//}

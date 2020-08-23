@@ -22,4 +22,3 @@ fun includeAndRename(path: String) {
 
 includeAndRename(":base")
 includeAndRename(":database")
-//include("test")

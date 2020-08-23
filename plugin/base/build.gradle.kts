@@ -6,7 +6,7 @@ plugins {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
+    api("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
 }
 
 gradlePlugin {

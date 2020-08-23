@@ -5,32 +5,32 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: openjdk:8-jdk
+      options: --user root
     steps:
       - uses: actions/setup-java@v1
         with:
           java-version: 8
 
       - name: 'Clone Repo'
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
+
+      - name: 'Validate Gradle Wrapper'
+        uses: gradle/wrapper-validation-action@v1
 
       - name: 'Build'
-        uses: eskatos/gradle-command-action@v1
-        with:
-          arguments: 'build --stacktrace'
+        run: './gradlew clean build --full-stacktrace'
 
       - name: 'Publish to BinTray'
-        uses: eskatos/gradle-command-action@v1
-        with:
-          arguments: 'bintrayUpload -Pnodryrun --stacktrace'
+        run: './gradlew bintrayUpload -Pnodryrun --stacktrace'
         env:
           BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
           BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
 
       - name: 'Publish Plugin to BinTray'
-        uses: eskatos/gradle-command-action@v1
-        with:
-          arguments: 'bintrayUpload -Pnodryrun --stacktrace'
-          build-root-directory: 'plugin'
+        run: './gradlew bintrayUpload -Pnodryrun --stacktrace'
+        working-directory: 'plugin'
         env:
           BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
           BINTRAY_USER: ${{ secrets.BINTRAY_USER }}

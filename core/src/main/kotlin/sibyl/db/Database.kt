@@ -2,12 +2,14 @@ package sibyl.db
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import mu.KotlinLogging
 import org.flywaydb.core.Flyway
 import sibyl.config.ConfigUtil
 import java.io.File
 import javax.sql.DataSource
 
 object Database {
+    private val logger = KotlinLogging.logger {}
     /**
      * this function initializes [dataSourceForSchema]
      */
@@ -15,6 +17,8 @@ object Database {
         val config = ConfigUtil.load(File("database.json"), DatabaseConfig.serializer()) {
             DatabaseConfig("localhost")
         }
+
+        logger.info { "creating database connection for schema $schema" }
 
         return HikariDataSource(
             HikariConfig().apply {

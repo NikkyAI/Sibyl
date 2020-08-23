@@ -74,16 +74,16 @@ now you should be ready to start hacking away
 1. follow [#setup](#setup)
 2. start matterbridge  
     make sure to have a api section configured
-    see [matterbridge/matterbridge-sample.toml](./matterbridge/matterbridge-sample.toml) as reference
+    see [matterbridge/matterbridge-sample.toml](matterbridge-config/matterbridge-sample.toml) as reference
 3. run `./gradlew :sample:run` once, expect it to fail, this is just to generate the first few config files
 4. edit `run/sample.json`  
    ```json
    {
        "$schema": "./schemas/sample.schema.json",
        "host": "localhost",
-       "token": "mytoken",
-       "useWebsocket": false,
-       "port": 4242
+       "token": null,
+       "port": 4242,
+       "useWebsocket": false
    }
    ```
    all config files have referenced json schemas,

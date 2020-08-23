@@ -1,8 +1,7 @@
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
-    id("moe.nikky.sibyl.plugin.database")
-    `maven-publish`
+//    `maven-publish`
 }
 
 dependencies {

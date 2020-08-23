@@ -2,9 +2,6 @@ import okhttp3.internal.toImmutableList
 
 plugins {
     id("com.jfrog.bintray") apply false
-//    `kotlin-dsl` apply false
-//    `java-gradle-plugin` apply false
-//    `maven-publish` apply false
 }
 
 group = "moe.nikky.sibyl.plugin"
@@ -34,7 +31,6 @@ subprojects {
 
     afterEvaluate {
         plugins.withId("maven-publish") {
-            val artifactId = project.path.drop(1).replace(':', '-')
             val publicationName = "sibylPlugin"
 
             val sourcesJar by tasks.creating(Jar::class) {
@@ -56,7 +52,7 @@ subprojects {
                         from(components["kotlin"])
                         artifact(sourcesJar)
                         artifact(javadocJar)
-                        this.artifactId = artifactId
+                        artifactId = project.path.drop(1).replace(':', '-')
                     }
                 }
 

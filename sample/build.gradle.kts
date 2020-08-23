@@ -11,6 +11,7 @@ dependencies {
     implementation(project(":client:polling"))
     implementation(project(":client:websocket"))
     implementation(project(":module:logging"))
+    implementation(project(":module:failtest"))
     implementation(project(":module:reminders"))
     implementation(project(":module:roleplay"))
     implementation(project(":module:paste"))

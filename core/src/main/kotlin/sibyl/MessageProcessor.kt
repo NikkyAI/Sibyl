@@ -21,9 +21,9 @@ class MessageProcessor(
 
     private lateinit var sendChannel: SendChannel<ApiMessage>
 
-    // TODO: make this funtion instead
-    internal var modules: List<SibylModule> = listOf()
-        private set
+    // TODO: make this function instead
+    private val mutModules: MutableList<SibylModule> = mutableListOf()
+    val modules: List<SibylModule> by ::mutModules
 
     private val incomingPipeline = Pipeline<ApiMessage>("incoming")
     private val outgoingPipeline = Pipeline<ResponseMessage>("outgoing", reversed = true)
@@ -32,6 +32,16 @@ class MessageProcessor(
 
     init {
         addModule(CoreModule())
+    }
+
+    private suspend fun sendResponse(response: ResponseMessage, stage: Stage?) {
+        // TODO: pass in output buffer ?
+        val transformedResponse =
+            if (stage != null) outgoingPipeline.process(response, stage) else outgoingPipeline.process(response)
+        if (transformedResponse != null) {
+            logger.info { "response from ${transformedResponse.from}" }
+            sendChannel.send(transformedResponse.message)
+        }
     }
 
     @OptIn(ExperimentalStdlibApi::class)
@@ -47,19 +57,23 @@ class MessageProcessor(
             }
         }
 
-        newModule.init(
-            messageProcessor = this,
-            sendResponse = { response: ResponseMessage, stage: Stage? ->
-                // TODO: pass in output buffer ?
-                val transformedResponse =
-                    if (stage != null) outgoingPipeline.process(response, stage) else outgoingPipeline.process(response)
-                if (transformedResponse != null) {
-                    logger.info { "response from ${transformedResponse.from}" }
-                    sendChannel.send(transformedResponse.message)
-                }
+        try {
+            newModule.init(
+                messageProcessor = this,
+                sendResponse = ::sendResponse
+            )
+            mutModules += newModule
+        } catch (e: MissingModuleDependency) {
+            logger.error(e) {
+                "module requires ${e.missing}"
             }
-        )
-        modules += newModule
+        } catch (e: Exception) {
+            logger.error(e) {
+                "module failed initialization"
+            }
+//            throw e
+        }
+
     }
 
     fun registerIncomingInterceptor(stage: Stage, interceptor: Interceptor<ApiMessage>) {

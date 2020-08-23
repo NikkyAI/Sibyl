@@ -1,0 +1,17 @@
+name: TEST
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [8-jdk, 11-jdk, 14-jdk]
+    container:
+      image: openjdk:${{ matrix.java }}
+      options: --user root
+    steps:
+      - uses: actions/checkout@v2
+      - uses: gradle/wrapper-validation-action@v1
+      - run: './gradlew clean build --refresh-dependencies --full-stacktrace --scan'

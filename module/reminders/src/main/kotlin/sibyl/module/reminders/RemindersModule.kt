@@ -12,9 +12,7 @@ import sibyl.MessageProcessor
 import sibyl.SibylModule
 import sibyl.api.ApiMessage
 import sibyl.commands.SibylCommand
-import sibyl.db.Database
-import sibyl.db.Reminders
-import sibyl.db.RemindersDatabase
+import sibyl.db.*
 
 class RemindersModule : SibylModule("reminders") {
     companion object {
@@ -42,7 +40,7 @@ class RemindersModule : SibylModule("reminders") {
             override fun encode(value: LocalDateTime) = value.toString(timestampWriteFormat)
         }
 
-        val dataSource = Database.dataSourceForSchema("sibyl-reminders")
+        val dataSource = Database.dataSourceForSchema(SCHEMA_NAME_REMINDERS)
 
         RemindersDatabase(
             driver = dataSource.asJdbcDriver(),

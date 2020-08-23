@@ -13,6 +13,7 @@ import sibyl.client.PollingClient
 import sibyl.client.WebsocketClient
 import sibyl.config.ConfigUtil
 import sibyl.haste.HasteService
+import sibyl.module.fail.FailModule
 import sibyl.module.logging.LoggingModule
 import sibyl.module.paste.PasteModule
 import sibyl.module.reminders.RemindersModule
@@ -35,6 +36,7 @@ val messageProcessor = MessageProcessor().apply {
     addModule(RemindersModule())
     addModule(PasteModule(HasteService(client)))
     addModule(RoleplayModule())
+    addModule(FailModule())
     addModule(TestModule())
 }
 
