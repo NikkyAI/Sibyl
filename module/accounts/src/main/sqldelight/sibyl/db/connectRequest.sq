@@ -1,0 +1,32 @@
+-- TODO: require LIMIT 1
+select:
+    SELECT *
+    FROM connectRequests
+    WHERE fromPlatform = :platform
+        AND fromUsername = :username
+        AND account = :account
+;
+
+selectAll:
+    SELECT *
+    FROM connectRequests
+    WHERE account = :account
+;
+
+-- TODO: RETURNING https://github.com/AlecStrong/sql-psi/issues/138
+delete:
+    DELETE FROM connectRequests
+    WHERE fromPlatform = :platform
+        AND fromUsername = :username
+        AND account = :account
+;
+
+-- TODO: RETURNING https://github.com/AlecStrong/sql-psi/issues/138
+deleteAll:
+    DELETE FROM connectRequests
+    WHERE account = :account
+;
+
+insert:
+    INSERT INTO connectRequests VALUES ?
+;

@@ -1,0 +1,17 @@
+-- TODO: require LIMIT 1
+select:
+    SELECT *
+    FROM platformAccount
+    WHERE platform = :platform AND userid = :userid
+;
+
+selectAllForAccount:
+    SELECT *
+    FROM platformAccount
+    WHERE account = :account
+;
+
+
+insert:
+    INSERT INTO platformAccount VALUES ?
+;

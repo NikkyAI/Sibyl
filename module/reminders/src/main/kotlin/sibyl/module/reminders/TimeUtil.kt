@@ -1,6 +1,5 @@
 package sibyl.module.reminders
 
-import org.joda.time.DateTime
 import org.joda.time.LocalDateTime
 import org.joda.time.Period
 import org.joda.time.format.PeriodFormat

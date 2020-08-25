@@ -17,7 +17,6 @@ abstract class SibylCommand(
     invokeWithoutSubcommand: Boolean = true,
     printHelpOnEmptyArgs: Boolean = false,
     helpTags: Map<String, String> = emptyMap(),
-    autoCompleteEnvvar: String? = "",
     allowMultipleSubcommands: Boolean = false,
     treatUnknownOptionsAsArgs: Boolean = false
 ) : CliktCommand(

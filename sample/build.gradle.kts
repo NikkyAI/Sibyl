@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":client:polling"))
     implementation(project(":client:websocket"))
+    implementation(project(":module:accounts"))
     implementation(project(":module:logging"))
     implementation(project(":module:failtest"))
     implementation(project(":module:reminders"))

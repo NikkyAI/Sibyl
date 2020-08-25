@@ -2,7 +2,6 @@ package sibyl.module.reminders
 
 import com.github.ajalt.clikt.parameters.arguments.*
 import mu.KotlinLogging
-import org.joda.time.Instant
 import org.joda.time.LocalDateTime
 import sibyl.commands.SibylCommand
 import sibyl.db.Reminders

@@ -1,6 +1,7 @@
 package sibyl.module.paste
 
 import io.ktor.client.*
+import mu.KotlinLogging
 import sibyl.MessageProcessor
 import sibyl.ResponseMessage
 import sibyl.SibylModule
@@ -11,6 +12,9 @@ class PasteModule(
     private val pasteService: PasteService,
     private val maxLines: Int = 2
 ) : SibylModule("pastee") {
+    companion object {
+        private val logger = KotlinLogging.logger {}
+    }
     override fun MessageProcessor.install() {
         require(messageProcessor.hasModule(CoreModule::class)) { "core module is not installed" }
 
@@ -23,11 +27,15 @@ class PasteModule(
             val pasteResponse = pasteService.paste(
                 content = message.text
             )
-            return response.copy(
-                message = response.message.copy(
-                    text = pasteResponse
+            if(pasteResponse != null) {
+                return response.copy(
+                    message = response.message.copy(
+                        text = pasteResponse
+                    )
                 )
-            )
+            } else {
+                logger.error("paste service failed")
+            }
         }
 
         return response

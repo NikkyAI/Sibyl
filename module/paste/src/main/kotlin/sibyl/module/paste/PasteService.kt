@@ -6,5 +6,5 @@ interface PasteService {
      *
      * @return url of paste
      */
-    suspend fun paste(content: String): String
+    suspend fun paste(content: String): String?
 }

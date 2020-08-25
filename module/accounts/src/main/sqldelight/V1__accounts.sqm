@@ -1,0 +1,50 @@
+import org.joda.time.LocalDateTime;
+
+CREATE TABLE lastSeen (
+    username  TEXT
+        NOT NULL,
+    platform   TEXT
+        NOT NULL,
+    userid    TEXT
+        NOT NULL,
+    timestamp TIMESTAMP AS LocalDateTime
+        NOT NULL,
+    PRIMARY KEY (username, platform)
+);
+
+CREATE TABLE accounts (
+    id           TEXT
+        NOT NULL PRIMARY KEY,
+    registeredAt TIMESTAMP AS LocalDateTime
+        NOT NULL
+);
+
+CREATE TABLE platformAccount (
+    platform   TEXT
+        NOT NULL,
+    userid    TEXT
+        NOT NULL,
+    account   TEXT
+        NOT NULL,
+    PRIMARY KEY (platform, userid),
+    CONSTRAINT fk_account
+        FOREIGN KEY(account)
+            REFERENCES accounts(id)
+);
+
+CREATE TABLE connectRequests (
+    fromPlatform   TEXT
+        NOT NULL,
+    fromUserid     TEXT
+        NOT NULL,
+    fromUsername   TEXT
+        NOT NULL,
+    requestedAt    TIMESTAMP AS LocalDateTime
+        NOT NULL,
+    account        TEXT
+        NOT NULL,
+    CONSTRAINT fk_account
+        FOREIGN KEY(account)
+            REFERENCES accounts(id),
+    PRIMARY KEY (fromPlatform, fromUsername, account)
+);

@@ -1,0 +1,13 @@
+selectAll:
+    SELECT *
+    FROM accounts
+;
+select:
+     SELECT *
+     FROM accounts
+     WHERE id = :id
+ ;
+
+insert:
+    INSERT INTO accounts VALUES ?
+;

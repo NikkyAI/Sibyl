@@ -1,0 +1,30 @@
+selectAll:
+    SELECT *
+    FROM lastSeen
+;
+
+select:
+    SELECT *
+    FROM lastSeen
+    WHERE lastSeen.platform = :platform AND lastSeen.username = :username
+;
+
+find:
+    SELECT *
+    FROM lastSeen
+    WHERE lastSeen.username = :username
+;
+
+insert:
+    INSERT INTO lastSeen (username, platform, userid, timestamp)
+    VALUES (?, ?, ?, ?)
+;
+
+update:
+    UPDATE lastSeen
+    SET
+        userid = :userid,
+        timestamp = :timestamp
+    WHERE
+        platform = :platform AND username = :username
+;

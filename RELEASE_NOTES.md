@@ -2,6 +2,7 @@
 
 ### 0.0.3
 
+- add account system
 - add reminders module
 - add sqldelight based postgres bindings
 - add json schema based configuration

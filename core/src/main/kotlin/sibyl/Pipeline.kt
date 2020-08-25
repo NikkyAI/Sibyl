@@ -23,16 +23,22 @@ class Pipeline<MSG: Any>(
     }
 
     // TODO: replace sendChannel with buffer something ?
+    /**
+     * @param message object to transform through interceptors
+     * @param stageFilter only process stages of the same and lower priority
+     */
     suspend fun process(message: MSG, stageFilter: Stage? = null): MSG? {
         logger.info { "processing $message" }
 
         val filteredInterceptors = if(stageFilter != null) interceptors.filterKeys { s -> s.priority <= stageFilter.priority } else interceptors
         val sortedInterceptors = filteredInterceptors.toSortedMap(
             if(reversed)
-                compareByDescending {  s-> s.priority  }
+                compareByDescending(Stage::priority)
             else
-                compareBy { s-> s.priority }
+                compareBy(Stage::priority)
         )
+
+        logger.info { "interceptors: ${sortedInterceptors.keys}" }
 
         val transformedMessage = run {
             sortedInterceptors.entries.fold(message) { msg, (stage, list) ->

@@ -17,6 +17,7 @@ import sibyl.module.fail.FailTestModule
 import sibyl.module.fail.FailOnLoadModule
 import sibyl.module.logging.LoggingModule
 import sibyl.module.paste.PasteModule
+import sibyl.module.accounts.AccountsModule
 import sibyl.module.reminders.RemindersModule
 import sibyl.test.TestModule
 import java.io.File
@@ -33,6 +34,7 @@ private val client = HttpClient(OkHttp) {
     install(WebSockets)
 }
 val messageProcessor = MessageProcessor().apply {
+    addModule(AccountsModule())
     addModule(LoggingModule())
     addModule(RemindersModule())
     addModule(PasteModule(HasteService(client)))

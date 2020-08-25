@@ -1,5 +1,6 @@
 package sibyl.api
 
+import kotlinx.serialization.SerialName
 import sibyl.jsonSerializerPretty
 import kotlinx.serialization.Serializable
 import org.joda.time.DateTime
@@ -20,7 +21,8 @@ data class ApiMessage(
     var channel: String = "",
     var userid: String = "",
     var avatar: String = "",
-    var account: String = "",
+    @SerialName("account")
+    var platform: String = "",
     var protocol: String = "",
     var event: String = "",
     var id: String = "",

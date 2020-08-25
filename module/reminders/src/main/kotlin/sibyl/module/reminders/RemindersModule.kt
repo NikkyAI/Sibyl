@@ -2,7 +2,6 @@ package sibyl.module.reminders
 
 import com.squareup.sqldelight.ColumnAdapter
 import com.squareup.sqldelight.sqlite.driver.asJdbcDriver
-import com.zaxxer.hikari.HikariDataSource
 import kotlinx.coroutines.*
 import mu.KotlinLogging
 import org.joda.time.LocalDateTime
@@ -23,15 +22,6 @@ class RemindersModule : SibylModule("reminders") {
         RemindCommand(this)
     )
 
-    private lateinit var dataSource: HikariDataSource
-
-    override fun MessageProcessor.install() {
-        dataSource = Database.dataSourceForSchema(schema = "sibyl-reminders")
-        Database.flywayMigrate(dataSource)
-        Database.flywayValidate(dataSource)
-        logger.info { "loaded data source" }
-    }
-
     val reminders by lazy {
         val timestampAdapter = object : ColumnAdapter<LocalDateTime, String> {
             val timestampWriteFormat = ISODateTimeFormat.dateTimeNoMillis() // DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
@@ -41,6 +31,8 @@ class RemindersModule : SibylModule("reminders") {
         }
 
         val dataSource = Database.dataSourceForSchema(SCHEMA_NAME_REMINDERS)
+        Database.flywayMigrate(dataSource)
+        Database.flywayValidate(dataSource)
 
         RemindersDatabase(
             driver = dataSource.asJdbcDriver(),
@@ -50,6 +42,11 @@ class RemindersModule : SibylModule("reminders") {
                 fulfilledAtAdapter = timestampAdapter
             )
         )
+    }
+
+    override fun MessageProcessor.install() {
+        val r = reminders
+        logger.info { "loaded data source with $r" }
     }
 
     private lateinit var job: Job
