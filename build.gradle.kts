@@ -82,7 +82,7 @@ subprojects {
 //                }
 //            }
         }
-        apply(from="${rootDir.path}/pom.gradle.kts")
+        apply(from="${rootDir.path}/mavenPom.gradle.kts")
         if (bintrayOrg == null || bintrayApiKey == null) {
             logger.error("bintray credentials not configured properly")
             return@withId

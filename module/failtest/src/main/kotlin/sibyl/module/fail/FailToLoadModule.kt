@@ -4,7 +4,7 @@ import mu.KotlinLogging
 import sibyl.MessageProcessor
 import sibyl.SibylModule
 
-class FailModule() : SibylModule("log", "logs messages and allows you to retrieve them") {
+class FailOnLoadModule() : SibylModule("failonload", "tests failure on install") {
     companion object {
         private val logger = KotlinLogging.logger {}
     }

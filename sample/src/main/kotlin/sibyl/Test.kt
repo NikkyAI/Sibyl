@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import org.joda.time.DateTime
 import sibyl.api.ApiMessage
 
 
@@ -37,7 +38,12 @@ fun main(vararg args: String) = runBlocking {
         )
             .map {
                 logger.info { it }
-                it.asMessage()
+                ApiMessage(
+                    text = it,
+                    username = "Tester",
+                    userid = "testUser",
+                    gateway = "testgateway"
+                )
             }
             .forEach { msg ->
                 msgProcessor.process(msg)

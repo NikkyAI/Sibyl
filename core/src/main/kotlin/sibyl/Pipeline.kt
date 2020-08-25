@@ -1,11 +1,15 @@
 package sibyl
 
 import mu.KotlinLogging
+import java.lang.IllegalStateException
 
 typealias Interceptor<E> = suspend (E, Stage) -> E?
+typealias InterceptorWithStage<E> = suspend (E, Stage) -> E?
+
 class Pipeline<MSG: Any>(
     val name: String,
-    val reversed: Boolean = false
+    val reversed: Boolean = false,
+    val sendErrorMessage: suspend (String, Exception, MSG, Stage, Interceptor<MSG>) -> Unit
 ) {
     companion object {
         private val logger = KotlinLogging.logger {}
@@ -35,7 +39,15 @@ class Pipeline<MSG: Any>(
                 logger.info { "$name processing stage $stage" }
                 val orderedList = if(reversed) list.asReversed() else list
                 orderedList.fold(msg) innerFold@{ innerMsg : MSG, interceptor: Interceptor<MSG> ->
-                    interceptor.invoke(innerMsg, stage)?.also {
+                    val interceptorResult = try {
+                        interceptor.invoke(innerMsg, stage)
+                    } catch(e: IllegalStateException) {
+                        logger.error(e) { "error during invocation of $interceptor" }
+                        // TODO: send message containing error here ?
+                        sendErrorMessage(name, e, innerMsg, stage, interceptor)
+                        null
+                    }
+                    interceptorResult?.also {
                         logger.debug { "after $interceptor: $it" }
                     } ?: return@run run {
                         logger.debug { "message consumed by $stage, $interceptor" }

@@ -1,12 +1,15 @@
 ## TODO:
 
 - [ ] url previews
+- [ ] service integrations
+  - [ ] wolfram alpha
+- [ ] karma (++,--,==)
 - [ ] database stuff
   - [x] each module on a separate schema
   - [x] setup postgres (pgdata on docker)
   - [x] figure out migrations
   - [ ] figure out migration test data
-- [ ] add errorhandling to module installation and interceptor invocation  
+- [ ] add error-handling to module installation and interceptor invocation  
       log errors and skip modules
 - reminders
   - [x] `!remind in <DURATION> <MESSAGE>`

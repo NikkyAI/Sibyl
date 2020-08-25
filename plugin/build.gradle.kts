@@ -68,7 +68,7 @@ subprojects {
 //                }
 //            }
             }
-            apply(from="${rootDir.parentFile.path}/pom.gradle.kts")
+            apply(from="${rootDir.parentFile.path}/mavenPom.gradle.kts")
             val pluginNames = the<GradlePluginDevelopmentExtension>().plugins.names
             logger.lifecycle("pluginNames: $pluginNames")
             val markerPublicationNames = pluginNames.map { pluginName ->

@@ -25,8 +25,39 @@ class MessageProcessor(
     private val mutModules: MutableList<SibylModule> = mutableListOf()
     val modules: List<SibylModule> by ::mutModules
 
-    private val incomingPipeline = Pipeline<ApiMessage>("incoming")
-    private val outgoingPipeline = Pipeline<ResponseMessage>("outgoing", reversed = true)
+    private val incomingPipeline = Pipeline<ApiMessage>(
+        name = "incoming",
+        sendErrorMessage = { name, exception, message, stage, handler ->
+            sendChannel.send(
+                ApiMessage(
+                    username = "error",
+                    text = """
+                            exception on stage $stage in '$handler' $name
+                            error-message: ${exception.localizedMessage.replace("\\s*\\n\\s*".toRegex(), "\\n ")}
+                            """.trimIndent(),
+//                text = "exception on stage $stage in '$handler' error-message: ${exception.localizedMessage.replace("\\s*\\n\\s*".toRegex(), "\\n ")}".trimIndent(),
+                    gateway = message.gateway
+                )
+            )
+        }
+    )
+    private val outgoingPipeline = Pipeline<ResponseMessage>(
+        name = "outgoing",
+        reversed = true,
+        sendErrorMessage = { name, exception, response, stage, handler ->
+            sendChannel.send(
+                ApiMessage(
+                    username = "error",
+                    text = """
+                            exception on stage $stage in '$handler' $name
+                            error-message: ${exception.localizedMessage.replace("\\s*\\n\\s*".toRegex(), "\\n ")}
+                            """.trimIndent(),
+//                    text = "exception on stage $stage in '$handler' error-message: ${exception.localizedMessage.replace("\\s*\\n\\s*".toRegex(), "\\n ")}".trimIndent(),
+                    gateway = response.message.gateway
+                )
+            )
+        }
+    )
 
     internal val userid = "${botname.toLowerCase()}.${UUID.randomUUID().toString().substringBefore('-')}"
 
@@ -111,6 +142,7 @@ class MessageProcessor(
             clazz.isInstance(module)
         }
     }
+
     fun <T : SibylModule> getModule(clazz: KClass<T>): T? {
         return modules.find { module ->
             clazz.isInstance(module)

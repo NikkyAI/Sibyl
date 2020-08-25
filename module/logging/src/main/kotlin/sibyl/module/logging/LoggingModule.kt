@@ -129,11 +129,3 @@ class LoggingModule(
         return messages
     }
 }
-
-@OptIn(ExperimentalContracts::class)
-fun <T> T.applyIf(condition: Boolean, block: T.() -> T): T {
-    contract {
-        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
-    }
-    return if(condition) block() else this
-}
