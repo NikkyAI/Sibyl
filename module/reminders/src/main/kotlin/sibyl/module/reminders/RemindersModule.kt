@@ -22,7 +22,7 @@ class RemindersModule : SibylModule("reminders") {
         RemindCommand(this)
     )
 
-    val reminders by lazy {
+    val db by lazy {
         val timestampAdapter = object : ColumnAdapter<LocalDateTime, String> {
             val timestampWriteFormat = ISODateTimeFormat.dateTimeNoMillis() // DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
             val timestampReadFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
@@ -45,7 +45,7 @@ class RemindersModule : SibylModule("reminders") {
     }
 
     override fun MessageProcessor.install() {
-        val r = reminders
+        val r = db
         logger.info { "loaded data source with $r" }
     }
 
@@ -68,7 +68,7 @@ class RemindersModule : SibylModule("reminders") {
 
     private suspend fun checkForReminder() {
         withContext(Dispatchers.IO) {
-            val unfulfilled = reminders.remindersQueries.selectUnfulfilled(LocalDateTime.now()).executeAsList()
+            val unfulfilled = db.remindersQueries.selectUnfulfilled(LocalDateTime.now()).executeAsList()
 
             for (reminder in unfulfilled) {
 //                val targetTimestamp = LocalDateTime.parse(reminder.target, timestampFormat)
@@ -84,15 +84,11 @@ class RemindersModule : SibylModule("reminders") {
                     fromCommand = null
                 )
 
-                reminders.remindersQueries.setFulFilled(
+                db.remindersQueries.setFulFilled(
                     LocalDateTime.now(), reminder.id
                 )
             }
         }
-    }
-
-    internal fun addReminder(reminder: Reminders) {
-        reminders.remindersQueries.insert(reminder)
     }
 
 }

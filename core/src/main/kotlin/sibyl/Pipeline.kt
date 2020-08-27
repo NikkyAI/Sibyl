@@ -47,7 +47,7 @@ class Pipeline<MSG: Any>(
                 orderedList.fold(msg) innerFold@{ innerMsg : MSG, interceptor: Interceptor<MSG> ->
                     val interceptorResult = try {
                         interceptor.invoke(innerMsg, stage)
-                    } catch(e: IllegalStateException) {
+                    } catch(e: Exception) {
                         logger.error(e) { "error during invocation of $interceptor" }
                         // TODO: send message containing error here ?
                         sendErrorMessage(name, e, innerMsg, stage, interceptor)

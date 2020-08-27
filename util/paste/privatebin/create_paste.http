@@ -1,0 +1,28 @@
+POST https://vim.cx/
+Content-Type: application/json
+X-Requested-With: JSONHttpRequest
+
+{
+  "v":2,
+  "adata":[
+    [
+      "${base64(cipher_iv)}",
+      "${base64cipher_salt)}",
+      100000,
+      256,
+      128,
+      "aes",
+      "gcm",
+      "none"
+    ],
+    "plaintext",
+    0,
+    0
+  ],
+  "ct": "${base64(cipher+text)}",
+  "meta": {
+    "expire":"5min"
+  }
+}
+
+###

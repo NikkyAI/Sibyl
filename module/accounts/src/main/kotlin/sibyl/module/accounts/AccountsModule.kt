@@ -102,4 +102,14 @@ class AccountsModule : SibylModule(
     suspend fun accountInfo(account: String)= withContext(Dispatchers.IO) {
         db.accountQueries.select(id = account).executeAsOneOrNull()
     }
+
+    fun platformsForAccount(account: String): String {
+        val existingPlatformAccounts = db.platformQueries.selectAllForAccount(
+            account = account
+        ).executeAsList()
+       return existingPlatformAccounts.joinToString(", ") {
+            "`${it.platform}`"
+        }
+    }
+
 }

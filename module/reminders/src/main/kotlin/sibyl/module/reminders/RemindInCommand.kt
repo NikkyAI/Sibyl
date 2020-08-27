@@ -24,20 +24,17 @@ class RemindInCommand(private val remindersModule: RemindersModule) : SibylComma
         args.joinToString(" ")
     }
     override fun run() {
-        val id = remindersModule.reminders.remindersQueries.selectMaxId().executeAsOneOrNull() ?: 0 // TODO: remove hack when SERIAL is fixed
+        val id = remindersModule.db.remindersQueries.selectMaxId().executeAsOneOrNull() ?: 0 // TODO: remove hack when SERIAL is fixed
 
         val targetDateTime = LocalDateTime.now() + period
-        remindersModule.addReminder(
-            Reminders(
-                id = id+1,
-                message = message,
-                username = causeMessage.username,
-                userid = causeMessage.userid,
-                gateway = causeMessage.gateway,
-                target = targetDateTime,
-                requestedAt = LocalDateTime.now(),
-                fulfilledAt = null
-            )
+        remindersModule.db.remindersQueries.insert(
+            id = id+1,
+            message = message,
+            username = causeMessage.username,
+            userid = causeMessage.userid,
+            gateway = causeMessage.gateway,
+            target = targetDateTime,
+            requestedAt = LocalDateTime.now()
         )
         echo("scheduled reminder at $targetDateTime")
 

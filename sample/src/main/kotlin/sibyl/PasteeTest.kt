@@ -4,9 +4,9 @@ import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import sibyl.module.paste.PasteeService
-import sibyl.module.paste.paste.Paste
-import sibyl.module.paste.paste.PasteSection
+import sibyl.pastee.PasteeService
+import sibyl.pastee.paste.Paste
+import sibyl.pastee.paste.PasteSection
 
 fun main(args: Array<String>) {
     val logger = KotlinLogging.logger {}

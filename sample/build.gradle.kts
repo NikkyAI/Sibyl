@@ -19,6 +19,7 @@ dependencies {
     implementation(project(":util:paste:pastee"))
     implementation(project(":util:paste:pastebin"))
     implementation(project(":util:paste:hastebin"))
+    implementation(project(":util:paste:privatebin"))
 
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:_")
 //    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")

@@ -7,6 +7,13 @@ select:
         AND account = :account
 ;
 
+selectByRequester:
+    SELECT *
+    FROM connectRequests
+    WHERE fromPlatform = :platform
+        AND fromUserid = :userid
+;
+
 selectAll:
     SELECT *
     FROM connectRequests

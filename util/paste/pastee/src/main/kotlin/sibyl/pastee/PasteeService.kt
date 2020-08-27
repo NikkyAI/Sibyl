@@ -1,4 +1,4 @@
-package sibyl.module.paste
+package sibyl.pastee
 
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -6,10 +6,11 @@ import io.ktor.content.*
 import io.ktor.http.*
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
-import sibyl.module.paste.paste.Paste
-import sibyl.module.paste.paste.PasteResponse
-import sibyl.module.paste.paste.PasteSection
-import sibyl.module.paste.syntax.SyntaxesResponse
+import sibyl.module.paste.PasteService
+import sibyl.pastee.paste.Paste
+import sibyl.pastee.paste.PasteResponse
+import sibyl.pastee.paste.PasteSection
+import sibyl.pastee.syntax.SyntaxesResponse
 
 class PasteeService(
     val httpClient: HttpClient,

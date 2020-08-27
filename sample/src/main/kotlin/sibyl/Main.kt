@@ -19,6 +19,8 @@ import sibyl.module.logging.LoggingModule
 import sibyl.module.paste.PasteModule
 import sibyl.module.accounts.AccountsModule
 import sibyl.module.reminders.RemindersModule
+import sibyl.privatebin.PrivatebinResponse
+import sibyl.privatebin.PrivatebinService
 import sibyl.test.TestModule
 import java.io.File
 
@@ -37,10 +39,10 @@ val messageProcessor = MessageProcessor().apply {
     addModule(AccountsModule())
     addModule(LoggingModule())
     addModule(RemindersModule())
-    addModule(PasteModule(HasteService(client)))
+    addModule(PasteModule(PrivatebinService(client)))
     addModule(RoleplayModule())
-    addModule(FailOnLoadModule())
-    addModule(FailTestModule())
+//    addModule(FailOnLoadModule())
+//    addModule(FailTestModule())
     addModule(TestModule())
 }
 

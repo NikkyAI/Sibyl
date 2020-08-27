@@ -22,6 +22,8 @@ allprojects {
         mavenCentral()
         maven(url = "https://kotlin.bintray.com/ktor")
         maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
+//        maven(url = "https://dl.bintray.com/korlibs/korlibs")
+        maven(url = "https://dl.bintray.com/novacrypto/BIP/")
     }
 }
 

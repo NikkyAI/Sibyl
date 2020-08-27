@@ -14,11 +14,11 @@ setFulFilled:
     UPDATE reminders
         SET fulfilledAt = :fulfilledAt
         WHERE id = :id
-
 ;
 
 insert:
-    INSERT INTO reminders VALUES ?
+    INSERT INTO reminders (id, message, username, userid, gateway, requestedAt, target)
+    VALUES (:id, :message, :username, :userid, :gateway, :requestedAt, :target)
 ;
 
 -- remove ugly hack when SERIAL works

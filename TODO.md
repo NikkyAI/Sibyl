@@ -24,7 +24,9 @@
 - [x] publish build-logic as plugin, so custom modules can reuse it
 - [ ] publish to oss sonatype (look at sqldelight as example)
 - [ ] sibyl-launcher (kotlin-scripting based executable jar)
-
+- [ ] nicknames bound to accounts
+- [ ] personality system
+  - fondness tracker (interactions with the bot username)
 
 ### planned features and stuff
 

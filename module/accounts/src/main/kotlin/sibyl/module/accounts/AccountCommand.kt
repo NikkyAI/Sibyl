@@ -8,7 +8,9 @@ import com.github.ajalt.clikt.parameters.options.eagerOption
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import mu.KotlinLogging
 import org.joda.time.LocalDateTime
+import org.postgresql.util.PSQLException
 import sibyl.commands.SibylCommand
 import sibyl.db.Accounts
 import sibyl.db.ConnectRequests
@@ -19,6 +21,10 @@ class AccountCommand(val module: AccountsModule) : SibylCommand(
     help = "manage and link different platforms",
     invokeWithoutSubcommand = false
 ) {
+    companion object {
+        private val logger = KotlinLogging.logger {}
+    }
+
     init {
         subcommands(
             Info(module),
@@ -39,7 +45,7 @@ class AccountCommand(val module: AccountsModule) : SibylCommand(
                 withContext(Dispatchers.IO) {
                     val myAccount = module.identifyAccount(causeMessage)
                     if (myAccount == null) {
-                        echo("not registered, create a account with `${module.commandPrefix}account register [NAME]`")
+                        echo("not registered, create a account with `${module.commandPrefix}account register [NAME]` or request to connect with `!account connect request [ACCOUNT]")
                         return@withContext
                     }
                     val info = module.accountInfo(myAccount)!!
@@ -130,6 +136,7 @@ class AccountCommand(val module: AccountsModule) : SibylCommand(
         init {
             subcommands(
                 Request(module),
+                Info(module),
                 Cancel(module),
                 Confirm(module),
                 Deny(module)
@@ -143,35 +150,6 @@ class AccountCommand(val module: AccountsModule) : SibylCommand(
             name = "request",
             help = "request to connect a platform account"
         ) {
-            init {
-                eagerOption("--list", help = "list all requests for you") {
-                    runBlocking {
-                        withContext(Dispatchers.IO) {
-                            val myAccount = module.identifyAccount(causeMessage)
-                            if (myAccount == null) {
-                                echo("not registered, create a account with `${module.commandPrefix}account register [NAME]`")
-                                return@withContext
-                            }
-
-                            val requests = module.db.connectRequestQueries.selectAll(myAccount).executeAsList()
-                            if (requests.isEmpty()) {
-                                echo("@$myAccount: no open requests")
-                            } else if (requests.size == 1) {
-                                val request = requests[0]
-                                echo("@$myAccount: `!account confirm|deny ${request.fromUsername} ${request.fromPlatform}`")
-                            } else if (requests.size > 1) {
-                                echo("@$myAccount: ${requests.size} open requests")
-                                requests.forEach { request ->
-                                    echo("> `!account confirm|deny ${request.fromUsername} ${request.fromPlatform}`")
-                                }
-                            }
-                            echo("@$myAccount ${requests.size}")
-                        }
-                    }
-                }
-            }
-
-
             private val account by argument("ACCOUNT").validate { account ->
                 val accountResult = module.db.accountQueries.select(account).executeAsOneOrNull()
                 require(accountResult != null) {
@@ -182,25 +160,97 @@ class AccountCommand(val module: AccountsModule) : SibylCommand(
             override fun run() {
                 // TODO: check if a request exists already
 
-                module.db.connectRequestQueries.insert(
-                    ConnectRequests(
-                        fromPlatform = causeMessage.platform,
-                        fromUsername = causeMessage.username.toLowerCase(),
-                        fromUserid = causeMessage.userid,
-                        requestedAt = LocalDateTime.now(),
-                        account = account
-                    )
-                )
-
-                val existingPlatformAccounts = module.db.platformQueries.selectAllForAccount(
+                val existingRequest =  module.db.connectRequestQueries.select(
+                    platform = causeMessage.platform,
+                    username = causeMessage.username.toLowerCase(),
                     account = account
-                ).executeAsList()
+                ).executeAsOneOrNull()
 
-                val platforms = existingPlatformAccounts.joinToString(",") {
-                    "`${it.platform}`"
+                if(existingRequest != null) {
+                    echo("request exists already..")
+                } else {
+
+                    try {
+                        module.db.connectRequestQueries.insert(
+                            ConnectRequests(
+                                fromPlatform = causeMessage.platform,
+                                fromUsername = causeMessage.username.toLowerCase(),
+                                fromUserid = causeMessage.userid,
+                                requestedAt = LocalDateTime.now(),
+                                account = account
+                            )
+                        )
+                    } catch (e: PSQLException) {
+                        logger.error(e) { "failure during SQL insert" }
+                        throw e
+                    }
                 }
 
+                val platforms = module.platformsForAccount(account)
+
                 echo("@$account please confirm by sending `!account connect confirm ${causeMessage.username.toLowerCase()} ${causeMessage.platform}` on ($platforms)")
+            }
+        }
+
+        class Info(val module: AccountsModule) : SibylCommand(
+            name = "info",
+            help = "list open requests"
+        ) {
+            override fun run() {
+                runBlocking {
+                    withContext(Dispatchers.IO) {
+                        val myAccount = module.identifyAccount(causeMessage)
+
+                        if (myAccount == null) {
+                            val requests = module.db.connectRequestQueries.selectByRequester(
+                                platform = causeMessage.platform,
+                                userid = causeMessage.userid
+                            ).executeAsList()
+                            when {
+                                requests.isEmpty() -> {
+                                    echo("@${causeMessage.username}: no open requests")
+                                }
+                                requests.size == 1 -> {
+                                    val request = requests[0]
+
+                                    val platforms = module.platformsForAccount(request.account)
+                                    echo("@${causeMessage.username}: `!account confirm|deny ${request.fromUsername} ${request.fromPlatform}` on ($platforms)")
+                                }
+                                requests.size > 1 -> {
+                                    echo("@${causeMessage.username}: ${requests.size} open requests")
+                                    requests.forEach { request ->
+                                        echo("> @${request.account}: `!account confirm|deny ${request.fromUsername} ${request.fromPlatform}`")
+                                    }
+                                }
+                            }
+                        } else {
+                            val requests = module.db.connectRequestQueries.selectAll(myAccount).executeAsList()
+                            when {
+                                requests.isEmpty() -> {
+                                    echo("@$myAccount: no open requests")
+                                }
+                                requests.size == 1 -> {
+                                    val request = requests[0]
+                                    val platforms = module.platformsForAccount(myAccount)
+                                    echo("@${request.account}: `!account confirm|deny ${request.fromUsername} ${request.fromPlatform}` on ($platforms)")
+                                }
+                                requests.size > 1 -> {
+                                    val existingPlatformAccounts = module.db.platformQueries.selectAllForAccount(
+                                        account = myAccount
+                                    ).executeAsList()
+                                    val platforms = existingPlatformAccounts.joinToString(",") {
+                                        "`${it.platform}`"
+                                    }
+                                    echo("@$myAccount: ${requests.size} open requests, respond to them on ($platforms)")
+                                    requests.forEach { request ->
+                                        echo("> `!account confirm|deny ${request.fromUsername} ${request.fromPlatform}`")
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
             }
         }
 
@@ -244,7 +294,7 @@ class AccountCommand(val module: AccountsModule) : SibylCommand(
                     withContext(Dispatchers.IO) {
                         val myAccount = module.identifyAccount(causeMessage)
                         if (myAccount == null) {
-                            echo("not registered, create a account with `${module.commandPrefix}account register [NAME]`")
+                            echo("not registered, create a account with `${module.commandPrefix}account register [NAME]` or request to connect with `!account connect request [ACCOUNT]`")
                             return@withContext
                         }
                         val request = module.db.connectRequestQueries.select(
@@ -284,7 +334,7 @@ class AccountCommand(val module: AccountsModule) : SibylCommand(
                         withContext(Dispatchers.IO) {
                             val myAccount = module.identifyAccount(causeMessage)
                             if (myAccount == null) {
-                                echo("not registered, create a account with `${module.commandPrefix}account register [NAME]`")
+                                echo("not registered, create a account with `${module.commandPrefix}account register [NAME]` or request to connect with `!account connect request [ACCOUNT]")
                                 return@withContext
                             }
 
@@ -305,7 +355,7 @@ class AccountCommand(val module: AccountsModule) : SibylCommand(
                     withContext(Dispatchers.IO) {
                         val myAccount = module.identifyAccount(causeMessage)
                         if (myAccount == null) {
-                            echo("not registered, create a account with `${module.commandPrefix}account register [NAME]`")
+                            echo("not registered, create a account with `${module.commandPrefix}account register [NAME]` or request to connect with `!account connect request [ACCOUNT]")
                             return@withContext
                         }
 

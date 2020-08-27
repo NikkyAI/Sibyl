@@ -78,6 +78,7 @@ class MessageProcessor(
     @OptIn(ExperimentalStdlibApi::class)
     fun addModule(newModule: SibylModule) {
         require(newModule !in modules) { "module ${newModule.name} cannot be registered multiple times" }
+
         modules.forEach { mod ->
             mod.commands.forEach { cmd ->
                 newModule.commands.forEach { newCmd ->
@@ -93,7 +94,6 @@ class MessageProcessor(
                 messageProcessor = this,
                 sendResponse = ::sendResponse
             )
-            mutModules += newModule
         } catch (e: MissingModuleDependency) {
             logger.error(e) {
                 "module requires ${e.missing}"
@@ -102,8 +102,16 @@ class MessageProcessor(
             logger.error(e) {
                 "module failed initialization"
             }
-//            throw e
+            throw e
         }
+        newModule.commands.forEach { newCmd ->
+            (newModule.commands - newCmd).forEach { otherNewCmd ->
+                require(newCmd.commandName != otherNewCmd.commandName) {
+                    "duplicate command ${newCmd.commandName} within module"
+                }
+            }
+        }
+        mutModules += newModule
 
     }
 

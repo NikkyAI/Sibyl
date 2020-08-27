@@ -1,6 +1,5 @@
 package sibyl.module.paste
 
-import io.ktor.client.*
 import mu.KotlinLogging
 import sibyl.MessageProcessor
 import sibyl.ResponseMessage
